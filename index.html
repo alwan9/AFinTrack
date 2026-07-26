@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="id" class="dark scroll-smooth">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AFinTrack — Manajemen Keuangan & Trading Profesional</title>
-  <meta name="description" content="AFinTrack adalah platform manajemen keuangan pribadi dan progress trading berbasis PWA. Pantau portofolio, catat transaksi, dan analisa trading Anda dengan cerdas.">
+  <meta name="description"
+    content="AFinTrack adalah platform manajemen keuangan pribadi dan progress trading berbasis PWA. Pantau portofolio, catat transaksi, dan analisa trading Anda dengan cerdas.">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#4f46e5">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -12,16 +14,19 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    body {
+      font-family: 'Inter', sans-serif;
+    }
 
     /* Animated gradient background */
     .hero-bg {
-      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(79,70,229,0.18) 0%, transparent 70%),
-                  radial-gradient(ellipse 60% 40% at 80% 80%, rgba(16,185,129,0.12) 0%, transparent 60%),
-                  radial-gradient(ellipse 50% 50% at 10% 80%, rgba(139,92,246,0.10) 0%, transparent 60%),
-                  #09090b;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(79, 70, 229, 0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 50% at 10% 80%, rgba(139, 92, 246, 0.10) 0%, transparent 60%),
+        #09090b;
     }
 
     /* Floating glow orbs */
@@ -32,15 +37,23 @@
       pointer-events: none;
       animation: float-orb 8s ease-in-out infinite;
     }
+
     @keyframes float-orb {
-      0%, 100% { transform: translateY(0px) scale(1); }
-      50% { transform: translateY(-24px) scale(1.05); }
+
+      0%,
+      100% {
+        transform: translateY(0px) scale(1);
+      }
+
+      50% {
+        transform: translateY(-24px) scale(1.05);
+      }
     }
 
     /* Grid pattern overlay */
     .grid-pattern {
-      background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
       background-size: 64px 64px;
     }
 
@@ -50,6 +63,7 @@
       transform: translateY(40px);
       transition: opacity 0.7s ease, transform 0.7s ease;
     }
+
     .fade-up.visible {
       opacity: 1;
       transform: translateY(0);
@@ -57,9 +71,9 @@
 
     /* Glassmorphism card */
     .glass-card {
-      background: rgba(255,255,255,0.04);
+      background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     /* Gradient text */
@@ -73,52 +87,95 @@
     /* CTA button glow */
     .btn-cta {
       background: linear-gradient(135deg, #4f46e5, #6d28d9);
-      box-shadow: 0 0 40px rgba(79,70,229,0.4), 0 4px 24px rgba(79,70,229,0.3);
+      box-shadow: 0 0 40px rgba(79, 70, 229, 0.4), 0 4px 24px rgba(79, 70, 229, 0.3);
       transition: all 0.3s ease;
     }
+
     .btn-cta:hover {
-      box-shadow: 0 0 60px rgba(79,70,229,0.6), 0 8px 32px rgba(79,70,229,0.4);
+      box-shadow: 0 0 60px rgba(79, 70, 229, 0.6), 0 8px 32px rgba(79, 70, 229, 0.4);
       transform: translateY(-2px);
     }
 
     /* Feature icon glow */
-    .feature-icon-indigo { box-shadow: 0 0 20px rgba(79,70,229,0.3); }
-    .feature-icon-emerald { box-shadow: 0 0 20px rgba(16,185,129,0.3); }
-    .feature-icon-violet { box-shadow: 0 0 20px rgba(139,92,246,0.3); }
-    .feature-icon-amber { box-shadow: 0 0 20px rgba(245,158,11,0.3); }
+    .feature-icon-indigo {
+      box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
+    }
+
+    .feature-icon-emerald {
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .feature-icon-violet {
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    }
+
+    .feature-icon-amber {
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+    }
 
     /* Stat card shine */
     .stat-card::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0;
+      top: 0;
+      left: 0;
+      right: 0;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
     }
 
     /* Nav blur */
     .nav-blur {
       backdrop-filter: blur(24px);
-      background: rgba(9,9,11,0.75);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(9, 9, 11, 0.75);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     /* Pulse ring */
     @keyframes ping-slow {
-      0% { transform: scale(1); opacity: 0.6; }
-      75%, 100% { transform: scale(1.8); opacity: 0; }
+      0% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+
+      75%,
+      100% {
+        transform: scale(1.8);
+        opacity: 0;
+      }
     }
-    .ping-slow { animation: ping-slow 2.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+    .ping-slow {
+      animation: ping-slow 2.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
 
     /* Stagger delays */
-    .delay-100 { transition-delay: 0.1s; }
-    .delay-200 { transition-delay: 0.2s; }
-    .delay-300 { transition-delay: 0.3s; }
-    .delay-400 { transition-delay: 0.4s; }
-    .delay-500 { transition-delay: 0.5s; }
-    .delay-600 { transition-delay: 0.6s; }
+    .delay-100 {
+      transition-delay: 0.1s;
+    }
+
+    .delay-200 {
+      transition-delay: 0.2s;
+    }
+
+    .delay-300 {
+      transition-delay: 0.3s;
+    }
+
+    .delay-400 {
+      transition-delay: 0.4s;
+    }
+
+    .delay-500 {
+      transition-delay: 0.5s;
+    }
+
+    .delay-600 {
+      transition-delay: 0.6s;
+    }
   </style>
 </head>
+
 <body class="hero-bg text-zinc-100 min-h-screen overflow-x-hidden">
 
   <!-- Grid Overlay -->
@@ -147,7 +204,8 @@
       </div>
       <!-- CTA Nav -->
       <div id="nav-cta-area">
-        <a href="./login.html" id="nav-login-btn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-sm transition shadow-lg shadow-indigo-600/30">
+        <a href="./login.html" id="nav-login-btn"
+          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-sm transition shadow-lg shadow-indigo-600/30">
           Masuk Aplikasi
         </a>
       </div>
@@ -159,7 +217,8 @@
     <div class="max-w-4xl mx-auto">
 
       <!-- Badge -->
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 glass-card rounded-full text-xs font-semibold text-indigo-300 mb-6 fade-up">
+      <div
+        class="inline-flex items-center gap-2 px-4 py-1.5 glass-card rounded-full text-xs font-semibold text-indigo-300 mb-6 fade-up">
         <span class="relative flex h-2 w-2">
           <span class="ping-slow absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -181,11 +240,13 @@
 
       <!-- CTA Buttons -->
       <div class="flex flex-col sm:flex-row gap-3 justify-center items-center fade-up delay-300">
-        <a href="./login.html" id="hero-cta-btn" class="btn-cta px-8 py-4 text-white font-bold rounded-2xl text-base flex items-center gap-2 w-full sm:w-auto justify-center">
+        <a href="./login.html" id="hero-cta-btn"
+          class="btn-cta px-8 py-4 text-white font-bold rounded-2xl text-base flex items-center gap-2 w-full sm:w-auto justify-center">
           <iconify-icon icon="lucide:log-in" class="text-lg"></iconify-icon>
           Masuk ke AFinTrack
         </a>
-        <a href="#features" class="px-8 py-4 glass-card hover:bg-white/8 text-zinc-300 hover:text-white font-semibold rounded-2xl text-base flex items-center gap-2 w-full sm:w-auto justify-center transition">
+        <a href="#features"
+          class="px-8 py-4 glass-card hover:bg-white/8 text-zinc-300 hover:text-white font-semibold rounded-2xl text-base flex items-center gap-2 w-full sm:w-auto justify-center transition">
           <iconify-icon icon="lucide:chevrons-down" class="text-lg"></iconify-icon>
           Lihat Fitur
         </a>
@@ -203,9 +264,12 @@
       <!-- Tab switcher -->
       <div class="flex justify-center mb-4">
         <div class="inline-flex gap-1 p-1 glass-card rounded-2xl">
-          <button onclick="switchPreview('dashboard')" id="tab-dashboard" class="px-3.5 py-1.5 rounded-xl text-[11px] font-bold bg-indigo-600 text-white transition-all shadow">Dashboard</button>
-          <button onclick="switchPreview('trading')" id="tab-trading" class="px-3.5 py-1.5 rounded-xl text-[11px] font-semibold text-zinc-400 hover:text-white transition-all">Trading</button>
-          <button onclick="switchPreview('finance')" id="tab-finance" class="px-3.5 py-1.5 rounded-xl text-[11px] font-semibold text-zinc-400 hover:text-white transition-all">Keuangan</button>
+          <button onclick="switchPreview('dashboard')" id="tab-dashboard"
+            class="px-3.5 py-1.5 rounded-xl text-[11px] font-bold bg-indigo-600 text-white transition-all shadow">Dashboard</button>
+          <button onclick="switchPreview('trading')" id="tab-trading"
+            class="px-3.5 py-1.5 rounded-xl text-[11px] font-semibold text-zinc-400 hover:text-white transition-all">Trading</button>
+          <button onclick="switchPreview('finance')" id="tab-finance"
+            class="px-3.5 py-1.5 rounded-xl text-[11px] font-semibold text-zinc-400 hover:text-white transition-all">Keuangan</button>
         </div>
       </div>
 
@@ -213,7 +277,9 @@
         <div class="bg-zinc-900 rounded-2xl p-3 border border-zinc-800">
           <!-- Browser bar -->
           <div class="flex items-center gap-2 mb-3 px-1">
-            <div class="flex gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500/60"></span><span class="w-3 h-3 rounded-full bg-amber-500/60"></span><span class="w-3 h-3 rounded-full bg-emerald-500/60"></span></div>
+            <div class="flex gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500/60"></span><span
+                class="w-3 h-3 rounded-full bg-amber-500/60"></span><span
+                class="w-3 h-3 rounded-full bg-emerald-500/60"></span></div>
             <div class="ml-2 flex-1 h-5 bg-zinc-800 rounded-full flex items-center px-3" id="hero-url-bar">
               <span class="text-[10px] text-zinc-500 font-medium">afintrack.app/dashboard.html</span>
             </div>
@@ -238,13 +304,18 @@
             <div class="bg-zinc-900 rounded-xl p-3 border border-zinc-800">
               <div class="text-[9px] text-zinc-500 mb-2">Kinerja 7 Hari Terakhir</div>
               <div class="flex items-end gap-1 h-12">
-                <div class="flex-1 bg-emerald-500/40 rounded-sm hover:bg-emerald-500/70 transition" style="height:40%"></div>
-                <div class="flex-1 bg-emerald-500/40 rounded-sm hover:bg-emerald-500/70 transition" style="height:65%"></div>
+                <div class="flex-1 bg-emerald-500/40 rounded-sm hover:bg-emerald-500/70 transition" style="height:40%">
+                </div>
+                <div class="flex-1 bg-emerald-500/40 rounded-sm hover:bg-emerald-500/70 transition" style="height:65%">
+                </div>
                 <div class="flex-1 bg-rose-500/40 rounded-sm hover:bg-rose-500/70 transition" style="height:30%"></div>
-                <div class="flex-1 bg-emerald-500/40 rounded-sm hover:bg-emerald-500/70 transition" style="height:80%"></div>
-                <div class="flex-1 bg-emerald-500/40 rounded-sm hover:bg-emerald-500/70 transition" style="height:55%"></div>
+                <div class="flex-1 bg-emerald-500/40 rounded-sm hover:bg-emerald-500/70 transition" style="height:80%">
+                </div>
+                <div class="flex-1 bg-emerald-500/40 rounded-sm hover:bg-emerald-500/70 transition" style="height:55%">
+                </div>
                 <div class="flex-1 bg-rose-500/40 rounded-sm hover:bg-rose-500/70 transition" style="height:20%"></div>
-                <div class="flex-1 bg-emerald-500/60 rounded-sm hover:bg-emerald-500 transition" style="height:100%"></div>
+                <div class="flex-1 bg-emerald-500/60 rounded-sm hover:bg-emerald-500 transition" style="height:100%">
+                </div>
               </div>
             </div>
           </div>
@@ -263,38 +334,77 @@
               </div>
             </div>
             <div class="grid grid-cols-3 gap-2">
-              <div class="bg-zinc-900 rounded-xl p-2 border border-zinc-800"><div class="text-[8px] text-zinc-500 mb-1">Pair</div><div class="text-xs font-bold text-white">XAUUSD</div></div>
-              <div class="bg-zinc-900 rounded-xl p-2 border border-emerald-500/30"><div class="text-[8px] text-zinc-500 mb-1">Arah</div><div class="text-xs font-bold text-emerald-400">BUY ▲</div></div>
-              <div class="bg-zinc-900 rounded-xl p-2 border border-zinc-800"><div class="text-[8px] text-zinc-500 mb-1">Lot</div><div class="text-xs font-bold text-white">0.01</div></div>
+              <div class="bg-zinc-900 rounded-xl p-2 border border-zinc-800">
+                <div class="text-[8px] text-zinc-500 mb-1">Pair</div>
+                <div class="text-xs font-bold text-white">XAUUSD</div>
+              </div>
+              <div class="bg-zinc-900 rounded-xl p-2 border border-emerald-500/30">
+                <div class="text-[8px] text-zinc-500 mb-1">Arah</div>
+                <div class="text-xs font-bold text-emerald-400">BUY ▲</div>
+              </div>
+              <div class="bg-zinc-900 rounded-xl p-2 border border-zinc-800">
+                <div class="text-[8px] text-zinc-500 mb-1">Lot</div>
+                <div class="text-xs font-bold text-white">0.01</div>
+              </div>
             </div>
             <div class="grid grid-cols-2 gap-2">
-              <div class="bg-rose-950/40 rounded-xl p-2 border border-rose-500/20"><div class="text-[8px] text-zinc-500 mb-1">Stop Loss</div><div class="text-xs font-bold text-rose-400">3,337.80</div></div>
-              <div class="bg-emerald-950/40 rounded-xl p-2 border border-emerald-500/20"><div class="text-[8px] text-zinc-500 mb-1">Take Profit</div><div class="text-xs font-bold text-emerald-400">3,352.80</div></div>
+              <div class="bg-rose-950/40 rounded-xl p-2 border border-rose-500/20">
+                <div class="text-[8px] text-zinc-500 mb-1">Stop Loss</div>
+                <div class="text-xs font-bold text-rose-400">3,337.80</div>
+              </div>
+              <div class="bg-emerald-950/40 rounded-xl p-2 border border-emerald-500/20">
+                <div class="text-[8px] text-zinc-500 mb-1">Take Profit</div>
+                <div class="text-xs font-bold text-emerald-400">3,352.80</div>
+              </div>
             </div>
             <div class="flex gap-2">
               <div class="flex-1 py-2 bg-emerald-600 rounded-xl text-center text-xs font-bold text-white">✅ PROFIT</div>
-              <div class="flex-1 py-2 bg-zinc-800 rounded-xl text-center text-xs font-semibold text-zinc-500">❌ LOSS</div>
+              <div class="flex-1 py-2 bg-zinc-800 rounded-xl text-center text-xs font-semibold text-zinc-500">❌ LOSS
+              </div>
             </div>
           </div>
 
           <!-- Finance Pane -->
           <div id="preview-finance" class="preview-pane hidden bg-zinc-950 rounded-xl p-4 space-y-3">
             <div class="grid grid-cols-3 gap-2">
-              <div class="bg-zinc-900 rounded-xl p-3 border border-zinc-800"><div class="text-[8px] text-zinc-500 mb-1">Pemasukan</div><div class="text-sm font-black text-emerald-400">Rp 8Jt</div></div>
-              <div class="bg-zinc-900 rounded-xl p-3 border border-zinc-800"><div class="text-[8px] text-zinc-500 mb-1">Pengeluaran</div><div class="text-sm font-black text-rose-400">Rp 1,8Jt</div></div>
-              <div class="bg-zinc-900 rounded-xl p-3 border border-indigo-500/20"><div class="text-[8px] text-zinc-500 mb-1">Saldo</div><div class="text-sm font-black text-indigo-400">Rp 6,2Jt</div></div>
+              <div class="bg-zinc-900 rounded-xl p-3 border border-zinc-800">
+                <div class="text-[8px] text-zinc-500 mb-1">Pemasukan</div>
+                <div class="text-sm font-black text-emerald-400">Rp 8Jt</div>
+              </div>
+              <div class="bg-zinc-900 rounded-xl p-3 border border-zinc-800">
+                <div class="text-[8px] text-zinc-500 mb-1">Pengeluaran</div>
+                <div class="text-sm font-black text-rose-400">Rp 1,8Jt</div>
+              </div>
+              <div class="bg-zinc-900 rounded-xl p-3 border border-indigo-500/20">
+                <div class="text-[8px] text-zinc-500 mb-1">Saldo</div>
+                <div class="text-sm font-black text-indigo-400">Rp 6,2Jt</div>
+              </div>
             </div>
             <div class="space-y-2">
-              <div class="flex items-center justify-between p-2.5 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-emerald-500/30 transition">
-                <div class="flex items-center gap-2"><div class="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center"><iconify-icon icon="lucide:arrow-down-left" class="text-emerald-400 text-xs"></iconify-icon></div><div class="text-[10px] font-semibold text-white">Gaji Bulanan</div></div>
+              <div
+                class="flex items-center justify-between p-2.5 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-emerald-500/30 transition">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center"><iconify-icon
+                      icon="lucide:arrow-down-left" class="text-emerald-400 text-xs"></iconify-icon></div>
+                  <div class="text-[10px] font-semibold text-white">Gaji Bulanan</div>
+                </div>
                 <span class="text-xs font-bold text-emerald-400">+Rp 5Jt</span>
               </div>
-              <div class="flex items-center justify-between p-2.5 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-rose-500/30 transition">
-                <div class="flex items-center gap-2"><div class="w-6 h-6 rounded-lg bg-rose-500/10 flex items-center justify-center"><iconify-icon icon="lucide:arrow-up-right" class="text-rose-400 text-xs"></iconify-icon></div><div class="text-[10px] font-semibold text-white">Makan & Transport</div></div>
+              <div
+                class="flex items-center justify-between p-2.5 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-rose-500/30 transition">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-lg bg-rose-500/10 flex items-center justify-center"><iconify-icon
+                      icon="lucide:arrow-up-right" class="text-rose-400 text-xs"></iconify-icon></div>
+                  <div class="text-[10px] font-semibold text-white">Makan & Transport</div>
+                </div>
                 <span class="text-xs font-bold text-rose-400">-Rp 150K</span>
               </div>
               <div class="flex items-center justify-between p-2.5 bg-zinc-900 rounded-xl border border-amber-500/20">
-                <div class="flex items-center gap-2"><div class="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center"><iconify-icon icon="lucide:refresh-cw" class="text-amber-400 text-xs"></iconify-icon></div><div class="text-[10px] font-semibold text-white">Tagihan Internet</div></div>
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center"><iconify-icon
+                      icon="lucide:refresh-cw" class="text-amber-400 text-xs"></iconify-icon></div>
+                  <div class="text-[10px] font-semibold text-white">Tagihan Internet</div>
+                </div>
                 <span class="text-xs font-bold text-rose-400">-Rp 200K</span>
               </div>
             </div>
@@ -303,7 +413,9 @@
         </div>
       </div>
       <!-- Glow under card -->
-      <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-16 bg-indigo-600/20 blur-2xl rounded-full pointer-events-none"></div>
+      <div
+        class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-16 bg-indigo-600/20 blur-2xl rounded-full pointer-events-none">
+      </div>
     </div>
   </section>
 
@@ -332,14 +444,20 @@
   <!-- ===== MASALAH VS SOLUSI (BEFORE & AFTER) ===== -->
   <section class="relative z-10 py-24 px-4 sm:px-6 overflow-hidden">
     <!-- Dekorasi background -->
-    <div class="absolute top-1/2 left-0 w-96 h-96 bg-rose-600/10 blur-[100px] rounded-full pointer-events-none -translate-y-1/2 -translate-x-1/2"></div>
-    <div class="absolute top-1/2 right-0 w-96 h-96 bg-emerald-600/10 blur-[100px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
+    <div
+      class="absolute top-1/2 left-0 w-96 h-96 bg-rose-600/10 blur-[100px] rounded-full pointer-events-none -translate-y-1/2 -translate-x-1/2">
+    </div>
+    <div
+      class="absolute top-1/2 right-0 w-96 h-96 bg-emerald-600/10 blur-[100px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/2">
+    </div>
 
     <div class="max-w-5xl mx-auto">
       <div class="text-center mb-16 fade-up">
         <p class="text-pink-400 font-semibold text-sm mb-3 uppercase tracking-widest">Kenapa AFinTrack?</p>
-        <h2 class="text-3xl sm:text-5xl font-black text-white mb-4">Meninggalkan Cara <span class="text-rose-400">Lama</span></h2>
-        <p class="text-zinc-500 max-w-xl mx-auto">Masih pusing rekap profit trading di Excel yang rumit atau nyatat uang masuk keluar di buku yang berantakan? Saatnya beralih.</p>
+        <h2 class="text-3xl sm:text-5xl font-black text-white mb-4">Meninggalkan Cara <span
+            class="text-rose-400">Lama</span></h2>
+        <p class="text-zinc-500 max-w-xl mx-auto">Masih pusing rekap profit trading di Excel yang rumit atau nyatat uang
+          masuk keluar di buku yang berantakan? Saatnya beralih.</p>
       </div>
 
       <div class="grid md:grid-cols-2 gap-8 items-stretch fade-up delay-200">
@@ -352,42 +470,64 @@
             </div>
             <h3 class="text-xl font-bold text-white mb-3">Cara Lama (Membingungkan)</h3>
             <ul class="space-y-3 text-zinc-400 text-sm mb-8">
-              <li class="flex items-start gap-2"><iconify-icon icon="lucide:x" class="text-rose-400 mt-1"></iconify-icon> Rumus Excel sering error dan berantakan.</li>
-              <li class="flex items-start gap-2"><iconify-icon icon="lucide:x" class="text-rose-400 mt-1"></iconify-icon> Susah dibuka di HP saat sedang di luar.</li>
-              <li class="flex items-start gap-2"><iconify-icon icon="lucide:x" class="text-rose-400 mt-1"></iconify-icon> Harus hitung win rate & P/L secara manual.</li>
-              <li class="flex items-start gap-2"><iconify-icon icon="lucide:x" class="text-rose-400 mt-1"></iconify-icon> Chart dan jurnal terpisah beda aplikasi.</li>
+              <li class="flex items-start gap-2"><iconify-icon icon="lucide:x"
+                  class="text-rose-400 mt-1"></iconify-icon> Rumus Excel sering error dan berantakan.</li>
+              <li class="flex items-start gap-2"><iconify-icon icon="lucide:x"
+                  class="text-rose-400 mt-1"></iconify-icon> Susah dibuka di HP saat sedang di luar.</li>
+              <li class="flex items-start gap-2"><iconify-icon icon="lucide:x"
+                  class="text-rose-400 mt-1"></iconify-icon> Harus hitung win rate & P/L secara manual.</li>
+              <li class="flex items-start gap-2"><iconify-icon icon="lucide:x"
+                  class="text-rose-400 mt-1"></iconify-icon> Chart dan jurnal terpisah beda aplikasi.</li>
             </ul>
             <!-- Mockup Excel Jelek -->
-            <div class="bg-zinc-900 rounded-xl p-3 border border-zinc-800 opacity-70 grayscale group-hover:grayscale-0 transition">
+            <div
+              class="bg-zinc-900 rounded-xl p-3 border border-zinc-800 opacity-70 grayscale group-hover:grayscale-0 transition">
               <div class="grid grid-cols-4 gap-1 mb-1">
-                <div class="bg-zinc-800 p-1 text-[8px] text-zinc-500 font-bold">DATE</div><div class="bg-zinc-800 p-1 text-[8px] text-zinc-500 font-bold">PAIR</div><div class="bg-zinc-800 p-1 text-[8px] text-zinc-500 font-bold">PROFIT</div><div class="bg-zinc-800 p-1 text-[8px] text-zinc-500 font-bold">#REF!</div>
+                <div class="bg-zinc-800 p-1 text-[8px] text-zinc-500 font-bold">DATE</div>
+                <div class="bg-zinc-800 p-1 text-[8px] text-zinc-500 font-bold">PAIR</div>
+                <div class="bg-zinc-800 p-1 text-[8px] text-zinc-500 font-bold">PROFIT</div>
+                <div class="bg-zinc-800 p-1 text-[8px] text-zinc-500 font-bold">#REF!</div>
               </div>
               <div class="grid grid-cols-4 gap-1">
-                <div class="bg-zinc-950 border border-zinc-800 p-1 text-[8px] text-zinc-600">12/4</div><div class="bg-zinc-950 border border-zinc-800 p-1 text-[8px] text-zinc-600">XAU</div><div class="bg-zinc-950 border border-zinc-800 p-1 text-[8px] text-zinc-600">12</div><div class="bg-rose-900/20 border border-rose-500/20 p-1 text-[8px] text-rose-500 font-bold">#DIV/0!</div>
+                <div class="bg-zinc-950 border border-zinc-800 p-1 text-[8px] text-zinc-600">12/4</div>
+                <div class="bg-zinc-950 border border-zinc-800 p-1 text-[8px] text-zinc-600">XAU</div>
+                <div class="bg-zinc-950 border border-zinc-800 p-1 text-[8px] text-zinc-600">12</div>
+                <div class="bg-rose-900/20 border border-rose-500/20 p-1 text-[8px] text-rose-500 font-bold">#DIV/0!
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- After (Solusi) -->
-        <div class="glass-card rounded-3xl p-8 border border-emerald-500/30 relative shadow-2xl shadow-emerald-900/10 group">
-          <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-indigo-500/10 rounded-3xl"></div>
+        <div
+          class="glass-card rounded-3xl p-8 border border-emerald-500/30 relative shadow-2xl shadow-emerald-900/10 group">
+          <div
+            class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-indigo-500/10 rounded-3xl">
+          </div>
           <div class="relative z-10">
             <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-6">
               <iconify-icon icon="lucide:check-circle-2" class="text-2xl"></iconify-icon>
             </div>
             <h3 class="text-xl font-bold text-white mb-3">Solusi: AFinTrack</h3>
-            <p class="text-emerald-300 font-medium text-sm mb-4">AFinTrack mengotomatiskan pencatatan dan evaluasi kamu.</p>
+            <p class="text-emerald-300 font-medium text-sm mb-4">AFinTrack mengotomatiskan pencatatan dan evaluasi kamu.
+            </p>
             <ul class="space-y-3 text-zinc-400 text-sm mb-8">
-              <li class="flex items-start gap-2"><iconify-icon icon="lucide:check" class="text-emerald-400 mt-1"></iconify-icon> Tampilan rapi, visualisasi chart otomatis.</li>
-              <li class="flex items-start gap-2"><iconify-icon icon="lucide:check" class="text-emerald-400 mt-1"></iconify-icon> Dioptimalkan penuh untuk layar HP (PWA).</li>
-              <li class="flex items-start gap-2"><iconify-icon icon="lucide:check" class="text-emerald-400 mt-1"></iconify-icon> Hitung Win Rate, P/L, SL/TP otomatis instan.</li>
-              <li class="flex items-start gap-2"><iconify-icon icon="lucide:check" class="text-emerald-400 mt-1"></iconify-icon> Chart TradingView langsung nempel di form.</li>
+              <li class="flex items-start gap-2"><iconify-icon icon="lucide:check"
+                  class="text-emerald-400 mt-1"></iconify-icon> Tampilan rapi, visualisasi chart otomatis.</li>
+              <li class="flex items-start gap-2"><iconify-icon icon="lucide:check"
+                  class="text-emerald-400 mt-1"></iconify-icon> Dioptimalkan penuh untuk layar HP (PWA).</li>
+              <li class="flex items-start gap-2"><iconify-icon icon="lucide:check"
+                  class="text-emerald-400 mt-1"></iconify-icon> Hitung Win Rate, P/L, SL/TP otomatis instan.</li>
+              <li class="flex items-start gap-2"><iconify-icon icon="lucide:check"
+                  class="text-emerald-400 mt-1"></iconify-icon> Chart TradingView langsung nempel di form.</li>
             </ul>
             <!-- Mockup Rapi -->
-            <div class="bg-zinc-950 rounded-xl p-3 border border-emerald-500/30 shadow-lg group-hover:scale-[1.02] transition transform duration-300">
+            <div
+              class="bg-zinc-950 rounded-xl p-3 border border-emerald-500/30 shadow-lg group-hover:scale-[1.02] transition transform duration-300">
               <div class="flex justify-between items-center mb-2">
-                <div class="text-[10px] font-bold text-white flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Win Rate: 68%</div>
+                <div class="text-[10px] font-bold text-white flex items-center gap-1"><span
+                    class="w-2 h-2 rounded-full bg-emerald-500"></span> Win Rate: 68%</div>
                 <div class="text-[10px] font-bold text-emerald-400">+ Rp 4,200,000</div>
               </div>
               <div class="flex gap-1 h-6">
@@ -409,46 +549,56 @@
 
       <div class="text-center mb-16 fade-up">
         <p class="text-indigo-400 font-semibold text-sm mb-3 uppercase tracking-widest">Fitur Unggulan</p>
-        <h2 class="text-3xl sm:text-5xl font-black text-white mb-4">Semua yang Anda Butuhkan<br><span class="gradient-text">Dalam Satu Platform</span></h2>
-        <p class="text-zinc-500 max-w-xl mx-auto">Dirancang untuk trader dan pengelola keuangan yang serius, dengan antarmuka yang intuitif dan cerdas.</p>
+        <h2 class="text-3xl sm:text-5xl font-black text-white mb-4">Semua yang Anda Butuhkan<br><span
+            class="gradient-text">Dalam Satu Platform</span></h2>
+        <p class="text-zinc-500 max-w-xl mx-auto">Dirancang untuk trader dan pengelola keuangan yang serius, dengan
+          antarmuka yang intuitif dan cerdas.</p>
       </div>
 
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
         <!-- Feature 1 -->
         <div class="glass-card rounded-3xl p-6 hover:bg-white/6 transition fade-up">
-          <div class="w-12 h-12 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mb-4 feature-icon-indigo">
+          <div
+            class="w-12 h-12 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mb-4 feature-icon-indigo">
             <iconify-icon icon="lucide:candlestick-chart" class="text-2xl"></iconify-icon>
           </div>
           <h3 class="font-bold text-white text-lg mb-2">Progress Trading Journal</h3>
-          <p class="text-zinc-500 text-sm leading-relaxed">Catat posisi BUY/SELL lengkap dengan Entry, SL, TP, Exit Price, Lot, P/L, dan catatan evaluasi. Hitung win rate & kinerja otomatis.</p>
+          <p class="text-zinc-500 text-sm leading-relaxed">Catat posisi BUY/SELL lengkap dengan Entry, SL, TP, Exit
+            Price, Lot, P/L, dan catatan evaluasi. Hitung win rate & kinerja otomatis.</p>
         </div>
 
         <!-- Feature 2 -->
         <div class="glass-card rounded-3xl p-6 hover:bg-white/6 transition fade-up delay-100">
-          <div class="w-12 h-12 bg-emerald-600/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-4 feature-icon-emerald">
+          <div
+            class="w-12 h-12 bg-emerald-600/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-4 feature-icon-emerald">
             <iconify-icon icon="lucide:wallet" class="text-2xl"></iconify-icon>
           </div>
           <h3 class="font-bold text-white text-lg mb-2">Manajemen Keuangan</h3>
-          <p class="text-zinc-500 text-sm leading-relaxed">Pantau pemasukan, pengeluaran, tagihan rutin, dan arus kas bulanan Anda dalam satu dashboard yang bersih dan rapi.</p>
+          <p class="text-zinc-500 text-sm leading-relaxed">Pantau pemasukan, pengeluaran, tagihan rutin, dan arus kas
+            bulanan Anda dalam satu dashboard yang bersih dan rapi.</p>
         </div>
 
         <!-- Feature 3 -->
         <div class="glass-card rounded-3xl p-6 hover:bg-white/6 transition fade-up delay-200">
-          <div class="w-12 h-12 bg-violet-600/20 text-violet-400 rounded-2xl flex items-center justify-center mb-4 feature-icon-violet">
+          <div
+            class="w-12 h-12 bg-violet-600/20 text-violet-400 rounded-2xl flex items-center justify-center mb-4 feature-icon-violet">
             <iconify-icon icon="lucide:line-chart" class="text-2xl"></iconify-icon>
           </div>
           <h3 class="font-bold text-white text-lg mb-2">Live Chart TradingView</h3>
-          <p class="text-zinc-500 text-sm leading-relaxed">Chart langsung terintegrasi TradingView dengan timeframe 5m, 30m, Daily. Drawing tools — Trendline, Fibonacci, R/R langsung tersedia.</p>
+          <p class="text-zinc-500 text-sm leading-relaxed">Chart langsung terintegrasi TradingView dengan timeframe 5m,
+            30m, Daily. Drawing tools — Trendline, Fibonacci, R/R langsung tersedia.</p>
         </div>
 
         <!-- Feature 4 -->
         <div class="glass-card rounded-3xl p-6 hover:bg-white/6 transition fade-up delay-100">
-          <div class="w-12 h-12 bg-amber-600/20 text-amber-400 rounded-2xl flex items-center justify-center mb-4 feature-icon-amber">
+          <div
+            class="w-12 h-12 bg-amber-600/20 text-amber-400 rounded-2xl flex items-center justify-center mb-4 feature-icon-amber">
             <iconify-icon icon="lucide:layout-dashboard" class="text-2xl"></iconify-icon>
           </div>
           <h3 class="font-bold text-white text-lg mb-2">Dashboard Analitik</h3>
-          <p class="text-zinc-500 text-sm leading-relaxed">Pantau ringkasan total trade, win rate, net P/L, saldo keuangan, dan grafik kinerja harian — semua dalam satu layar.</p>
+          <p class="text-zinc-500 text-sm leading-relaxed">Pantau ringkasan total trade, win rate, net P/L, saldo
+            keuangan, dan grafik kinerja harian — semua dalam satu layar.</p>
         </div>
 
         <!-- Feature 5 -->
@@ -457,7 +607,8 @@
             <iconify-icon icon="lucide:shield-check" class="text-2xl"></iconify-icon>
           </div>
           <h3 class="font-bold text-white text-lg mb-2">Multi-User & Permission</h3>
-          <p class="text-zinc-500 text-sm leading-relaxed">Sistem role lengkap — Super Admin, Admin, dan User biasa. Kontrol akses modul Trading, Finance, dan CRUD per-user.</p>
+          <p class="text-zinc-500 text-sm leading-relaxed">Sistem role lengkap — Super Admin, Admin, dan User biasa.
+            Kontrol akses modul Trading, Finance, dan CRUD per-user.</p>
         </div>
 
         <!-- Feature 6 -->
@@ -466,7 +617,8 @@
             <iconify-icon icon="lucide:smartphone" class="text-2xl"></iconify-icon>
           </div>
           <h3 class="font-bold text-white text-lg mb-2">PWA — Install di HP</h3>
-          <p class="text-zinc-500 text-sm leading-relaxed">Bisa diinstall seperti aplikasi native di Android & iOS. Akses offline, ikon di home screen, dan notifikasi push tersedia.</p>
+          <p class="text-zinc-500 text-sm leading-relaxed">Bisa diinstall seperti aplikasi native di Android & iOS.
+            Akses offline, ikon di home screen, dan notifikasi push tersedia.</p>
         </div>
 
       </div>
@@ -476,18 +628,26 @@
   <!-- ===== PWA & OFFLINE CAPABILITY ===== -->
   <section class="relative z-10 py-24 px-4 sm:px-6 bg-zinc-950/50 border-y border-zinc-800/50 overflow-hidden">
     <!-- Dekorasi -->
-    <div class="absolute -right-20 top-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-600/10 blur-[100px] rounded-full pointer-events-none"></div>
+    <div
+      class="absolute -right-20 top-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-600/10 blur-[100px] rounded-full pointer-events-none">
+    </div>
 
     <div class="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
       <!-- Image / Mockup Phone -->
       <div class="w-full lg:w-1/2 flex justify-center relative fade-up">
         <!-- Lingkaran latar -->
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full border border-cyan-500/20 bg-cyan-500/5 animate-pulse"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full border border-cyan-500/10 delay-75"></div>
+        <div
+          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full border border-cyan-500/20 bg-cyan-500/5 animate-pulse">
+        </div>
+        <div
+          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full border border-cyan-500/10 delay-75">
+        </div>
 
         <!-- Phone Mockup -->
-        <div class="relative w-64 h-[500px] bg-zinc-950 rounded-[40px] border-[6px] border-zinc-800 shadow-2xl shadow-cyan-900/20 p-2 z-10">
-          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-5 bg-zinc-800 rounded-b-2xl z-20"></div> <!-- Notch -->
+        <div
+          class="relative w-64 h-[500px] bg-zinc-950 rounded-[40px] border-[6px] border-zinc-800 shadow-2xl shadow-cyan-900/20 p-2 z-10">
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-5 bg-zinc-800 rounded-b-2xl z-20"></div>
+          <!-- Notch -->
           <div class="w-full h-full bg-zinc-900 rounded-[30px] overflow-hidden relative flex flex-col">
             <!-- App Header -->
             <div class="bg-indigo-600 px-4 pt-8 pb-3 flex items-center justify-between">
@@ -515,7 +675,8 @@
             <div class="bg-zinc-900 p-3 flex justify-between items-center border-t border-zinc-800">
               <iconify-icon icon="lucide:layout-dashboard" class="text-indigo-400 text-lg"></iconify-icon>
               <iconify-icon icon="lucide:candlestick-chart" class="text-zinc-500 text-lg"></iconify-icon>
-              <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center -mt-8 shadow-lg shadow-indigo-600/40 border-[3px] border-zinc-950">
+              <div
+                class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center -mt-8 shadow-lg shadow-indigo-600/40 border-[3px] border-zinc-950">
                 <iconify-icon icon="lucide:plus" class="text-white text-xl"></iconify-icon>
               </div>
               <iconify-icon icon="lucide:wallet" class="text-zinc-500 text-lg"></iconify-icon>
@@ -525,7 +686,8 @@
         </div>
 
         <!-- Float Badge -->
-        <div class="absolute bottom-12 -right-4 glass-card px-4 py-3 rounded-2xl border border-emerald-500/30 flex items-center gap-3 z-20 animate-bounce shadow-xl">
+        <div
+          class="absolute bottom-12 -right-4 glass-card px-4 py-3 rounded-2xl border border-emerald-500/30 flex items-center gap-3 z-20 animate-bounce shadow-xl">
           <div class="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
             <iconify-icon icon="lucide:wifi-off" class="text-emerald-400 text-sm"></iconify-icon>
           </div>
@@ -538,23 +700,30 @@
 
       <!-- Text / Info -->
       <div class="w-full lg:w-1/2 fade-up delay-100 text-center lg:text-left">
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-cyan-600/10 text-cyan-400 rounded-lg text-xs font-bold mb-4 border border-cyan-500/20">
+        <div
+          class="inline-flex items-center gap-2 px-3 py-1 bg-cyan-600/10 text-cyan-400 rounded-lg text-xs font-bold mb-4 border border-cyan-500/20">
           <iconify-icon icon="lucide:smartphone"></iconify-icon> Install Seperti Aplikasi Asli
         </div>
-        <h2 class="text-3xl sm:text-4xl font-black text-white mb-5 leading-tight">Berjalan Mulus di HP Tanpa Harus ke <span class="text-cyan-400">PlayStore</span></h2>
-        <p class="text-zinc-400 text-sm sm:text-base mb-8 leading-relaxed">AFinTrack dibangun menggunakan teknologi Progressive Web App (PWA). Cukup buka dari browser, klik "Add to Homescreen", dan nikmati pengalaman aplikasi asli. Tidak memakan storage besar, cepat, dan ringan.</p>
+        <h2 class="text-3xl sm:text-4xl font-black text-white mb-5 leading-tight">Berjalan Mulus di HP Tanpa Harus ke
+          <span class="text-cyan-400">PlayStore</span></h2>
+        <p class="text-zinc-400 text-sm sm:text-base mb-8 leading-relaxed">AFinTrack dibangun menggunakan teknologi
+          Progressive Web App (PWA). Cukup buka dari browser, klik "Add to Homescreen", dan nikmati pengalaman aplikasi
+          asli. Tidak memakan storage besar, cepat, dan ringan.</p>
 
         <ul class="space-y-4 mb-8 text-left inline-block lg:block">
           <li class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center"><iconify-icon icon="logos:apple" class="text-sm"></iconify-icon></div>
+            <div class="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center">
+              <iconify-icon icon="logos:apple" class="text-sm"></iconify-icon></div>
             <span class="text-sm font-semibold text-white">iOS (iPhone & iPad) via Safari</span>
           </li>
           <li class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center"><iconify-icon icon="logos:android-icon" class="text-sm"></iconify-icon></div>
+            <div class="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center">
+              <iconify-icon icon="logos:android-icon" class="text-sm"></iconify-icon></div>
             <span class="text-sm font-semibold text-white">Android via Google Chrome</span>
           </li>
           <li class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center"><iconify-icon icon="lucide:laptop" class="text-zinc-400 text-sm"></iconify-icon></div>
+            <div class="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center">
+              <iconify-icon icon="lucide:laptop" class="text-zinc-400 text-sm"></iconify-icon></div>
             <span class="text-sm font-semibold text-white">Windows / Mac via Edge / Chrome</span>
           </li>
         </ul>
@@ -567,23 +736,33 @@
     <div class="max-w-4xl mx-auto">
       <div class="text-center mb-16 fade-up">
         <p class="text-emerald-400 font-semibold text-sm mb-3 uppercase tracking-widest">Cara Kerja</p>
-        <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">Mulai dalam <span class="gradient-text">3 Langkah Mudah</span></h2>
+        <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">Mulai dalam <span class="gradient-text">3 Langkah
+            Mudah</span></h2>
       </div>
       <div class="grid sm:grid-cols-3 gap-6">
         <div class="text-center fade-up">
-          <div class="w-14 h-14 bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-black text-xl rounded-2xl flex items-center justify-center mx-auto mb-4">1</div>
+          <div
+            class="w-14 h-14 bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-black text-xl rounded-2xl flex items-center justify-center mx-auto mb-4">
+            1</div>
           <h3 class="font-bold text-white mb-2">Setup Akun</h3>
-          <p class="text-zinc-500 text-sm">Login dengan akun yang diberikan Super Admin. Tidak perlu registrasi publik — sistem privat & aman.</p>
+          <p class="text-zinc-500 text-sm">Login dengan akun yang diberikan Super Admin. Tidak perlu registrasi publik —
+            sistem privat & aman.</p>
         </div>
         <div class="text-center fade-up delay-200">
-          <div class="w-14 h-14 bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 font-black text-xl rounded-2xl flex items-center justify-center mx-auto mb-4">2</div>
+          <div
+            class="w-14 h-14 bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 font-black text-xl rounded-2xl flex items-center justify-center mx-auto mb-4">
+            2</div>
           <h3 class="font-bold text-white mb-2">Catat Transaksi</h3>
-          <p class="text-zinc-500 text-sm">Masukkan posisi trading atau transaksi keuangan Anda dengan mudah. Auto-fill SL/TP berdasarkan harga live.</p>
+          <p class="text-zinc-500 text-sm">Masukkan posisi trading atau transaksi keuangan Anda dengan mudah. Auto-fill
+            SL/TP berdasarkan harga live.</p>
         </div>
         <div class="text-center fade-up delay-400">
-          <div class="w-14 h-14 bg-violet-600/20 border border-violet-500/30 text-violet-400 font-black text-xl rounded-2xl flex items-center justify-center mx-auto mb-4">3</div>
+          <div
+            class="w-14 h-14 bg-violet-600/20 border border-violet-500/30 text-violet-400 font-black text-xl rounded-2xl flex items-center justify-center mx-auto mb-4">
+            3</div>
           <h3 class="font-bold text-white mb-2">Analisa & Evaluasi</h3>
-          <p class="text-zinc-500 text-sm">Pantau performa melalui dashboard. Lihat win rate, P/L, grafik kinerja, dan evaluasi strategi trading Anda.</p>
+          <p class="text-zinc-500 text-sm">Pantau performa melalui dashboard. Lihat win rate, P/L, grafik kinerja, dan
+            evaluasi strategi trading Anda.</p>
         </div>
       </div>
     </div>
@@ -594,16 +773,24 @@
     <div class="max-w-3xl mx-auto text-center fade-up">
       <div class="glass-card rounded-3xl p-10 sm:p-14 relative overflow-hidden">
         <!-- Inner glow -->
-        <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-transparent to-emerald-500/8 pointer-events-none rounded-3xl"></div>
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent"></div>
+        <div
+          class="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-transparent to-emerald-500/8 pointer-events-none rounded-3xl">
+        </div>
+        <div
+          class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent">
+        </div>
 
         <div class="relative z-10">
-          <div class="w-16 h-16 bg-indigo-600/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-indigo-500/30">
+          <div
+            class="w-16 h-16 bg-indigo-600/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-indigo-500/30">
             <iconify-icon icon="lucide:chart-line" class="text-indigo-400 text-3xl"></iconify-icon>
           </div>
-          <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">Siap Mengelola<br><span class="gradient-text">Keuangan & Trading</span> Anda?</h2>
-          <p class="text-zinc-500 mb-8 text-sm sm:text-base">Masuk sekarang dan mulai perjalanan menuju keuangan yang lebih sehat dan trading yang lebih disiplin.</p>
-          <a href="./login.html" id="final-cta-btn" class="btn-cta inline-flex items-center gap-2 px-10 py-4 text-white font-bold rounded-2xl text-base">
+          <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">Siap Mengelola<br><span
+              class="gradient-text">Keuangan & Trading</span> Anda?</h2>
+          <p class="text-zinc-500 mb-8 text-sm sm:text-base">Masuk sekarang dan mulai perjalanan menuju keuangan yang
+            lebih sehat dan trading yang lebih disiplin.</p>
+          <a href="./login.html" id="final-cta-btn"
+            class="btn-cta inline-flex items-center gap-2 px-10 py-4 text-white font-bold rounded-2xl text-base">
             <iconify-icon icon="lucide:log-in" class="text-lg"></iconify-icon>
             Masuk ke AFinTrack
           </a>
@@ -623,19 +810,23 @@
         <!-- Brand -->
         <div>
           <div class="flex items-center gap-2 mb-3">
-            <div class="w-8 h-8 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/30">
+            <div
+              class="w-8 h-8 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/30">
               <iconify-icon icon="lucide:chart-line" class="text-white text-sm"></iconify-icon>
             </div>
             <span class="font-extrabold text-white text-base">AFinTrack</span>
           </div>
-          <p class="text-xs text-zinc-500 leading-relaxed">Platform manajemen keuangan pribadi & progress trading berbasis PWA. Data tersimpan aman di Google Sheets milik Anda.</p>
+          <p class="text-xs text-zinc-500 leading-relaxed">Platform manajemen keuangan pribadi & progress trading
+            berbasis PWA. Data tersimpan aman di Google Sheets milik Anda.</p>
         </div>
 
         <!-- Daftar Akun -->
         <div>
           <h4 class="text-xs font-bold text-white uppercase tracking-widest mb-4">Ingin Punya Akun?</h4>
           <div class="glass-card rounded-2xl p-4 border border-indigo-500/20 bg-indigo-600/5">
-            <p class="text-xs text-zinc-400 mb-3 leading-relaxed">Aplikasi ini bersifat <span class="text-indigo-400 font-semibold">privat & by-invite</span>. Hubungi owner melalui Instagram untuk meminta akses.</p>
+            <p class="text-xs text-zinc-400 mb-3 leading-relaxed">Aplikasi ini bersifat <span
+                class="text-indigo-400 font-semibold">privat & by-invite</span>. Hubungi owner melalui Instagram untuk
+              meminta akses.</p>
             <a href="https://instagram.com/zzls__" target="_blank" rel="noopener noreferrer"
               class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-rose-500 hover:from-pink-500 hover:to-rose-400 text-white text-xs font-bold rounded-xl transition w-full justify-center shadow-lg shadow-pink-900/30">
               <iconify-icon icon="mdi:instagram" class="text-base"></iconify-icon>
@@ -650,25 +841,29 @@
           <div class="space-y-3">
             <a href="https://instagram.com/zzls__" target="_blank" rel="noopener noreferrer"
               class="flex items-center gap-3 p-3 glass-card rounded-xl hover:bg-white/6 transition group">
-              <div class="w-8 h-8 bg-gradient-to-br from-pink-500 to-rose-500 rounded-lg flex items-center justify-center shadow-sm">
+              <div
+                class="w-8 h-8 bg-gradient-to-br from-pink-500 to-rose-500 rounded-lg flex items-center justify-center shadow-sm">
                 <iconify-icon icon="mdi:instagram" class="text-white text-sm"></iconify-icon>
               </div>
               <div>
                 <div class="text-xs font-bold text-white group-hover:text-pink-400 transition">@zzls__</div>
                 <div class="text-[10px] text-zinc-500">Instagram</div>
               </div>
-              <iconify-icon icon="lucide:external-link" class="text-zinc-600 text-xs ml-auto group-hover:text-zinc-400 transition"></iconify-icon>
+              <iconify-icon icon="lucide:external-link"
+                class="text-zinc-600 text-xs ml-auto group-hover:text-zinc-400 transition"></iconify-icon>
             </a>
             <a href="https://github.com/alwan9" target="_blank" rel="noopener noreferrer"
               class="flex items-center gap-3 p-3 glass-card rounded-xl hover:bg-white/6 transition group">
-              <div class="w-8 h-8 bg-zinc-800 rounded-lg flex items-center justify-center border border-zinc-700 shadow-sm">
+              <div
+                class="w-8 h-8 bg-zinc-800 rounded-lg flex items-center justify-center border border-zinc-700 shadow-sm">
                 <iconify-icon icon="mdi:github" class="text-white text-sm"></iconify-icon>
               </div>
               <div>
                 <div class="text-xs font-bold text-white group-hover:text-zinc-300 transition">alwan9</div>
                 <div class="text-[10px] text-zinc-500">GitHub</div>
               </div>
-              <iconify-icon icon="lucide:external-link" class="text-zinc-600 text-xs ml-auto group-hover:text-zinc-400 transition"></iconify-icon>
+              <iconify-icon icon="lucide:external-link"
+                class="text-zinc-600 text-xs ml-auto group-hover:text-zinc-400 transition"></iconify-icon>
             </a>
           </div>
         </div>
@@ -676,7 +871,8 @@
 
       <!-- Bottom Footer -->
       <div class="border-t border-zinc-800/50 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p class="text-[11px] text-zinc-600">© 2025 AFinTrack by <a href="https://instagram.com/zzls__" target="_blank" class="text-zinc-500 hover:text-pink-400 transition font-semibold">@zzls__</a>. All rights reserved.</p>
+        <p class="text-[11px] text-zinc-600">© 2025 AFinTrack by <a href="https://instagram.com/zzls__" target="_blank"
+            class="text-zinc-500 hover:text-pink-400 transition font-semibold">@zzls__</a>. All rights reserved.</p>
         <p class="text-[11px] text-zinc-700">Powered by Google Apps Script · PWA Ready</p>
       </div>
     </div>
@@ -775,4 +971,5 @@
     }
   </script>
 </body>
+
 </html>

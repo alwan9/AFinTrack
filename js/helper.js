@@ -253,7 +253,7 @@ function sendLocalNotification(title, options = {}) {
     navigator.serviceWorker.ready.then(reg => {
       reg.showNotification(title, defaultOptions);
     }).catch(() => {
-      try { new Notification(title, defaultOptions); } catch (e) {}
+      try { new Notification(title, defaultOptions); } catch (e) { }
     });
   } else {
     try {
