@@ -215,10 +215,18 @@ function resetAllSettingsToDefault() {
 }
 
 function copySiriShortcutLink() {
-  const link = window.location.origin + window.location.pathname.replace('settings.html', 'finance.html') + '?voice=true';
-  navigator.clipboard.writeText(link).then(() => {
-    showToast('✅ URL Pintasan Voice Assistant berhasil disalin ke clipboard!', 'success');
+  const session = typeof getSession === 'function' ? getSession() : {};
+  const token = session ? session.token : '';
+  const baseUrl = typeof AFINTRACK_API_URL !== 'undefined' ? AFINTRACK_API_URL : '';
+
+  const webhookUrl = `${baseUrl}?action=voiceAddFinance&token=${encodeURIComponent(token)}&speech=[Dikte_Suara_Siri]`;
+  const pwaUrl = window.location.origin + window.location.pathname.replace('settings.html', 'finance.html') + '?autoVoice=true';
+
+  const textToCopy = `[1. Webhook Direct Background (Zero-Click)]\n${webhookUrl}\n\n[2. PWA Auto-Mic Link]\n${pwaUrl}`;
+
+  navigator.clipboard.writeText(textToCopy).then(() => {
+    showToast('✅ Pintasan URL Siri / Google Assistant (Zero-Click Direct to Sheet) berhasil disalin!', 'success');
   }).catch(() => {
-    showToast(`URL Pintasan: ${link}`, 'info');
+    showToast('Berhasil membuat URL Pintasan Siri / Assistant.', 'info');
   });
 }
