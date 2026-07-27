@@ -27,7 +27,8 @@ function initUserInfo() {
 
 function checkSuperAdminGuard() {
   const session = getSession();
-  const isSA = session && (session.role === 'Super Admin' || session.role === 'admin' || session.username.toLowerCase() === 'wansmin' || session.username.toLowerCase() === 'admin');
+  const usernameLower = session ? (session.username || '').toLowerCase() : '';
+  const isSA = session && (session.role === 'Super Admin' || session.role === 'admin' || usernameLower === 'wansmin' || usernameLower === 'admin');
   if (!isSA) {
     showToast('Akses ditolak: Halaman ini khusus untuk Super Admin.', 'error');
     setTimeout(() => {

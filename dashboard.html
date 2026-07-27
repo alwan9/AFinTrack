@@ -45,9 +45,13 @@
           <iconify-icon icon="lucide:wallet-cards"></iconify-icon>
           <span>Kelola Keuangan</span>
         </a>
-        <a id="nav-admin-link" href="admin.html" class="hidden px-4 py-2 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-lg transition flex items-center gap-1.5">
+        <a id="nav-admin-link" href="admin.html" class="hidden px-3.5 py-2 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-lg transition flex items-center gap-1.5">
           <iconify-icon icon="lucide:shield-check"></iconify-icon>
           <span>Panel Admin</span>
+        </a>
+        <a id="nav-settings-link" href="settings.html" class="px-3.5 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition flex items-center gap-1.5">
+          <iconify-icon icon="lucide:settings"></iconify-icon>
+          <span>Pengaturan</span>
         </a>
       </nav>
 
@@ -60,6 +64,10 @@
         <button id="btn-theme-toggle" onclick="toggleTheme()" class="p-2 text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition text-base flex items-center justify-center" title="Toggle Theme">
           <iconify-icon icon="lucide:moon" class="text-lg text-indigo-300"></iconify-icon>
         </button>
+
+        <a href="settings.html" class="p-2 text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition text-base flex items-center justify-center" title="Pengaturan Aplikasi">
+          <iconify-icon icon="lucide:settings" class="text-lg text-zinc-400"></iconify-icon>
+        </a>
 
         <div class="text-right hidden sm:block border-l border-zinc-200 dark:border-zinc-800 pl-3">
           <p id="user-display-name" class="text-xs font-bold text-zinc-800 dark:text-zinc-200">User</p>
@@ -277,6 +285,9 @@
       </a>
       <a id="mobile-fin-link" href="finance.html" class="flex flex-col items-center gap-1 px-3 py-1.5 text-zinc-400 hover:text-white font-medium text-[11px]">
         <iconify-icon icon="lucide:wallet-cards" class="text-base"></iconify-icon> Keuangan
+      </a>
+      <a id="mobile-settings-link" href="settings.html" class="flex flex-col items-center gap-1 px-3 py-1.5 text-zinc-400 hover:text-white font-medium text-[11px]">
+        <iconify-icon icon="lucide:settings" class="text-base"></iconify-icon> Setelan
       </a>
       <a id="mobile-admin-link" href="admin.html" class="hidden flex flex-col items-center gap-1 px-3 py-1.5 text-amber-400 font-medium text-[11px]">
         <iconify-icon icon="lucide:shield-check" class="text-base"></iconify-icon> Admin

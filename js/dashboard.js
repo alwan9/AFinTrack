@@ -23,15 +23,18 @@ function initUserInfo() {
 
 function checkSuperAdmin() {
   const session = getSession();
-  if (session && (session.role === 'Super Admin' || session.role === 'admin' || session.username.toLowerCase() === 'wansmin' || session.username.toLowerCase() === 'admin')) {
-    const banner = document.getElementById('superadmin-banner');
-    if (banner) banner.classList.remove('hidden');
+  if (session) {
+    const usernameLower = (session.username || '').toLowerCase();
+    if (session.role === 'Super Admin' || session.role === 'admin' || usernameLower === 'wansmin' || usernameLower === 'admin') {
+      const banner = document.getElementById('superadmin-banner');
+      if (banner) banner.classList.remove('hidden');
 
-    const navLink = document.getElementById('nav-admin-link');
-    if (navLink) navLink.classList.remove('hidden');
+      const navLink = document.getElementById('nav-admin-link');
+      if (navLink) navLink.classList.remove('hidden');
 
-    const mobileLink = document.getElementById('mobile-admin-link');
-    if (mobileLink) mobileLink.classList.remove('hidden');
+      const mobileLink = document.getElementById('mobile-admin-link');
+      if (mobileLink) mobileLink.classList.remove('hidden');
+    }
   }
 }
 

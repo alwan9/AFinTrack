@@ -64,17 +64,20 @@ function renderTradingSkeleton() {
   if (tbody) {
     tbody.innerHTML = Array(5).fill(0).map(() => `
       <tr class="animate-pulse border-b border-zinc-200 dark:border-zinc-800/60 text-xs">
-        <td class="px-4 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-16"></div></td>
-        <td class="px-4 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-20"></div></td>
-        <td class="px-4 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-14"></div></td>
-        <td class="px-4 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-12"></div></td>
-        <td class="px-4 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-12"></div></td>
-        <td class="px-4 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-12"></div></td>
-        <td class="px-4 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-12"></div></td>
-        <td class="px-4 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-10"></div></td>
-        <td class="px-4 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-24"></div></td>
-        <td class="px-4 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-10"></div></td>
-        <td class="px-4 py-3.5 text-right"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-12 ml-auto"></div></td>
+        <td class="px-3 py-3.5 text-center"><div class="h-3 w-3 bg-zinc-300 dark:bg-zinc-800 rounded mx-auto"></div></td>
+        <td class="px-3 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-16"></div></td>
+        <td class="px-3 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-20"></div></td>
+        <td class="px-3 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-12"></div></td>
+        <td class="px-3 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-12"></div></td>
+        <td class="px-3 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-12"></div></td>
+        <td class="px-3 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-12"></div></td>
+        <td class="px-3 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-12"></div></td>
+        <td class="px-3 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-10"></div></td>
+        <td class="px-3 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-10"></div></td>
+        <td class="px-3 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-24"></div></td>
+        <td class="px-3 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-16"></div></td>
+        <td class="px-3 py-3.5"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-20"></div></td>
+        <td class="px-3 py-3.5 text-right"><div class="h-3 bg-zinc-300 dark:bg-zinc-800 rounded w-12 ml-auto"></div></td>
       </tr>
     `).join('');
   }
@@ -95,16 +98,27 @@ function checkAndNotifyRunningTrades(items) {
   }
 }
 
-// Helper Penentu Ukuran Pip per Instrumen
-function getPipSize(pair = 'XAUUSD') {
+// Helper Penentu Ukuran Pip per Instrumen & Skala Harga Entry
+function getPipSize(pair = 'XAUUSD', entryVal = 0) {
   const p = (pair || 'XAUUSD').toUpperCase().replace('/', '').trim();
+  const entry = Number(entryVal) || 0;
+
   if (p.includes('XAU') || p.includes('GOLD')) {
-    return 0.10; // Gold/XAUUSD: $0.10 = 1 pip (10 pips = $1.00)
+    return 0.10; // Gold/XAUUSD: $0.10 = 1 pip
   } else if (p.includes('JPY')) {
-    return 0.01; // JPY Pairs: 0.01 = 1 pip
+    return 0.01;  // JPY Pairs: 0.01 = 1 pip
   } else if (p.includes('BTC') || p.includes('ETH')) {
-    return 1.0;  // Crypto: $1.00 = 1 pip
+    return 1.0;   // Crypto: $1.00 = 1 pip
   }
+
+  // Jika skala harga entry besar (misal 5000): 
+  // entry >= 1000 -> 2.0 (50 pips = 100 poin Risk, 100 pips = 200 poin Reward untuk R:R 1:2)
+  if (entry >= 1000) {
+    return 2.0;
+  } else if (entry >= 100) {
+    return 0.10;
+  }
+
   return 0.0001; // Standard Forex: 0.0001 = 1 pip
 }
 
@@ -263,9 +277,15 @@ function start5MinReminderTimer() {
 let currentTradingViewTimeframe = '5';
 
 // TradingView Widget Generator (Support Timeframe 5m, 30m, Daily & Drawing Toolbar)
-function initTradingViewWidget(symbol = 'OANDA:XAUUSD', interval = null) {
+function initTradingViewWidget(symbol = null, interval = null) {
   const container = document.getElementById('tradingview-widget-container');
   if (!container) return;
+
+  const appSettings = typeof getAppSettings === 'function' ? getAppSettings() : {};
+  if (!symbol || symbol === 'OANDA:XAUUSD') {
+    const defaultPair = appSettings.defaultPair || 'XAUUSD';
+    symbol = defaultPair.includes(':') ? defaultPair : `OANDA:${defaultPair}`;
+  }
 
   if (interval) {
     currentTradingViewTimeframe = interval;
@@ -403,8 +423,69 @@ async function fetchLiveTickerPrice(pairName = 'XAUUSD') {
   }
 }
 
-// Auto Calculate Default SL (-50 pips) & TP (Kelipatan 50 pips berdasarkan Risk:Reward 1:1, 1:2, 1:3, 1:4, 1:5)
+// Helper Hitung Rasio Risk:Reward (RR) Aktual dari Nilai Entry, SL & TP
+function calculateActualRR(entry, sl, tp, defaultRR = '1:2') {
+  const entryVal = Number(entry) || 0;
+  const slVal = Number(sl) || 0;
+  const tpVal = Number(tp) || 0;
+
+  if (entryVal > 0 && slVal > 0 && tpVal > 0 && slVal !== entryVal) {
+    const risk = Math.abs(entryVal - slVal);
+    const reward = Math.abs(entryVal - tpVal);
+    if (risk > 0) {
+      const ratio = (reward / risk).toFixed(1);
+      const formattedRatio = ratio.endsWith('.0') ? parseInt(ratio) : ratio;
+      return `1:${formattedRatio}`;
+    }
+  }
+  return defaultRR;
+}
+
+// Update Label SL dan TP sesuai Tipe Posisi (BUY / SELL) & RR
+function updateSLTPLabels() {
+  const buySell = document.getElementById('input-buysell')?.value || 'BUY';
+  const labelSL = document.getElementById('label-sl');
+  const labelTP = document.getElementById('label-tp');
+  const rrVal = document.getElementById('input-rr')?.value || '1:2';
+
+  if (labelSL) {
+    labelSL.textContent = buySell === 'BUY'
+      ? 'Stop Loss (SL < Entry)'
+      : 'Stop Loss (SL > Entry)';
+  }
+  if (labelTP) {
+    labelTP.textContent = buySell === 'BUY'
+      ? `Take Profit (TP > Entry, ${rrVal})`
+      : `Take Profit (TP < Entry, ${rrVal})`;
+  }
+}
+
+// Handler Saat Pengguna Memasukkan SL atau TP Secara Manual
+function onManualSLTPInput() {
+  const slInput = document.getElementById('input-sl');
+  const tpInput = document.getElementById('input-tp');
+  if (slInput) slInput.dataset.manual = 'true';
+  if (tpInput) tpInput.dataset.manual = 'true';
+
+  const entryVal = parseFloat(document.getElementById('input-entry')?.value) || 0;
+  const slVal = parseFloat(slInput?.value) || 0;
+  const tpVal = parseFloat(tpInput?.value) || 0;
+
+  if (entryVal > 0 && slVal > 0 && tpVal > 0) {
+    const actualRR = calculateActualRR(entryVal, slVal, tpVal);
+    const rrSelect = document.getElementById('input-rr');
+    if (rrSelect) {
+      const matchedOpt = Array.from(rrSelect.options).find(opt => opt.value === actualRR);
+      if (matchedOpt) {
+        rrSelect.value = actualRR;
+      }
+    }
+  }
+}
+
+// Auto Calculate Default SL (-50 pips) & TP (Kelipatan 50 pips berdasarkan Risk:Reward)
 function autoCalculateSLTP(force = false) {
+  updateSLTPLabels();
   const entryVal = parseFloat(document.getElementById('input-entry')?.value) || 0;
   if (entryVal <= 0) return;
 
@@ -427,17 +508,11 @@ function autoCalculateSLTP(force = false) {
     rrRatio = parseFloat(rrVal) || 2;
   }
 
-  let pipSize = 0.0001;
-  if (pair.includes('XAU') || pair.includes('GOLD')) {
-    pipSize = 0.10;
-  } else if (pair.includes('JPY')) {
-    pipSize = 0.01;
-  } else if (pair.includes('BTC') || pair.includes('ETH')) {
-    pipSize = 1.0;
-  }
+  let pipSize = getPipSize(pair, entryVal);
 
-  const slPips = 50;
-  const tpPips = 50 * rrRatio;
+  const appSettings = typeof getAppSettings === 'function' ? getAppSettings() : {};
+  const slPips = Number(appSettings.defaultSLPips) || 50;
+  const tpPips = slPips * rrRatio;
 
   const tpDistance = tpPips * pipSize;
   const slDistance = slPips * pipSize;
@@ -453,7 +528,10 @@ function autoCalculateSLTP(force = false) {
     calculatedSL = entryVal + slDistance;
   }
 
-  const decimals = (pair.includes('XAU') || pair.includes('JPY')) ? 2 : (pair.includes('BTC') ? 1 : 4);
+  let decimals = (entryVal >= 100 || pair.includes('XAU') || pair.includes('JPY')) ? 2 : (pair.includes('BTC') ? 1 : 4);
+  if (Number.isInteger(entryVal) && Number.isInteger(calculatedSL) && Number.isInteger(calculatedTP)) {
+    decimals = 0;
+  }
 
   tpInput.value = calculatedTP.toFixed(decimals);
   slInput.value = calculatedSL.toFixed(decimals);
@@ -461,7 +539,7 @@ function autoCalculateSLTP(force = false) {
   tpInput.dataset.manual = 'false';
 
   if (force) {
-    showToast(`SL (-50p) & TP (+${tpPips}p untuk R:R ${rrVal}) diterapkan`, 'info');
+    showToast(`SL (${buySell === 'BUY' ? '-' : '+'}${slPips}p) & TP (${buySell === 'BUY' ? '+' : '-'}${tpPips}p) untuk R:R ${rrVal} diterapkan`, 'info');
   }
 }
 
@@ -582,11 +660,21 @@ function renderStatsSummary() {
 function getOrCalculateSLTP(item) {
   let sl = item.SL && Number(item.SL) > 0 ? Number(item.SL) : 0;
   let tp = item.TP && Number(item.TP) > 0 ? Number(item.TP) : 0;
+  const entryVal = Number(item.Entry) || 0;
+  const buySell = item.BuySell || 'BUY';
 
-  if ((!sl || !tp) && item.Entry && Number(item.Entry) > 0) {
-    const entryVal = Number(item.Entry);
+  // Validasi Arah Logis: Untuk BUY -> SL < Entry & TP > Entry. Untuk SELL -> SL > Entry & TP < Entry
+  let invalidDirection = false;
+  if (entryVal > 0 && sl > 0 && tp > 0) {
+    if (buySell === 'BUY' && (sl >= entryVal || tp <= entryVal)) {
+      invalidDirection = true;
+    } else if (buySell === 'SELL' && (sl <= entryVal || tp >= entryVal)) {
+      invalidDirection = true;
+    }
+  }
+
+  if ((!sl || !tp || invalidDirection) && entryVal > 0) {
     const pair = (item.Pair || 'XAUUSD').toUpperCase();
-    const buySell = item.BuySell || 'BUY';
     const rrVal = String(item.RR || '1:2');
 
     let rrRatio = 2;
@@ -596,27 +684,21 @@ function getOrCalculateSLTP(item) {
       rrRatio = parseFloat(rrVal) || 2;
     }
 
-    let pipSize = 0.0001;
-    if (pair.includes('XAU') || pair.includes('GOLD')) {
-      pipSize = 0.10;
-    } else if (pair.includes('JPY')) {
-      pipSize = 0.01;
-    } else if (pair.includes('BTC') || pair.includes('ETH')) {
-      pipSize = 1.0;
-    }
+    let pipSize = getPipSize(pair, entryVal);
 
     const slPips = 50;
     const tpPips = 50 * rrRatio;
     const tpDistance = tpPips * pipSize;
     const slDistance = slPips * pipSize;
 
-    const decimals = (pair.includes('XAU') || pair.includes('JPY')) ? 2 : (pair.includes('BTC') ? 1 : 4);
+    let decimals = (entryVal >= 100 || pair.includes('XAU') || pair.includes('JPY')) ? 2 : (pair.includes('BTC') ? 1 : 4);
+    if (Number.isInteger(entryVal)) decimals = 0;
 
-    if (!sl) {
+    if (!sl || invalidDirection) {
       sl = buySell === 'BUY' ? (entryVal - slDistance) : (entryVal + slDistance);
       sl = parseFloat(sl.toFixed(decimals));
     }
-    if (!tp) {
+    if (!tp || invalidDirection) {
       tp = buySell === 'BUY' ? (entryVal + tpDistance) : (entryVal - tpDistance);
       tp = parseFloat(tp.toFixed(decimals));
     }
@@ -639,12 +721,13 @@ function renderTradingTable() {
   if (pageItems.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="11" class="text-center py-8 text-zinc-400 text-sm">
+        <td colspan="14" class="text-center py-8 text-zinc-400 text-sm">
           Tidak ada data trading ditemukan.
         </td>
       </tr>
     `;
     renderPagination();
+    updateBatchDeleteButtonState();
     return;
   }
 
@@ -654,8 +737,8 @@ function renderTradingTable() {
     const isProfit = pl >= 0;
     
     const bsBadge = item.BuySell === 'BUY' 
-      ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30' 
-      : 'bg-rose-500/10 text-rose-500 border-rose-500/30';
+      ? '<span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 text-[10px] font-bold">BUY</span>' 
+      : '<span class="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 border border-rose-500/30 text-[10px] font-bold">SELL</span>';
 
     let statusBadge = isRunning 
       ? '<span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30 text-[10px] font-bold flex items-center gap-1 w-max">⏳ RUNNING</span>'
@@ -664,32 +747,35 @@ function renderTradingTable() {
           : '<span class="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 border border-rose-500/30 text-[10px] font-bold flex items-center gap-1 w-max">❌ LOSS</span>');
 
     const { sl: displaySL, tp: displayTP } = getOrCalculateSLTP(item);
+    const computedRR = (item.Entry && displaySL !== '-' && displayTP !== '-')
+      ? calculateActualRR(item.Entry, displaySL, displayTP, item.RR || '1:2')
+      : (item.RR || '1:2');
 
     return `
       <tr class="hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition border-b border-zinc-200 dark:border-zinc-800/60 text-xs text-zinc-700 dark:text-zinc-300">
-        <td class="px-4 py-3 font-medium">${formatDate(item.Tanggal)}</td>
-        <td class="px-4 py-3 font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+        <td class="px-3 py-3 text-center">
+          <input type="checkbox" class="trading-row-checkbox w-4 h-4 accent-indigo-600 rounded cursor-pointer" value="${item.TradingID}" onchange="updateBatchDeleteButtonState()">
+        </td>
+        <td class="px-3 py-3 font-medium whitespace-nowrap">${formatDate(item.Tanggal)}</td>
+        <td class="px-3 py-3 font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 whitespace-nowrap">
           <span>${item.Pair}</span>
           <button onclick="changeSymbol('${item.Pair}')" title="Lihat Chart" class="text-indigo-500 hover:underline text-[10px] flex items-center">
             <iconify-icon icon="lucide:line-chart" class="text-xs"></iconify-icon>
           </button>
         </td>
-        <td class="px-4 py-3">
-          <div class="flex flex-col gap-1">
-            <span class="px-2 py-0.5 rounded-full border text-[10px] font-bold ${bsBadge} w-max">${item.BuySell}</span>
-            ${statusBadge}
-          </div>
+        <td class="px-3 py-3">${bsBadge}</td>
+        <td class="px-3 py-3 font-medium">${item.Entry || 0}</td>
+        <td class="px-3 py-3 text-rose-500 dark:text-rose-400 font-bold">${displaySL}</td>
+        <td class="px-3 py-3 text-emerald-500 dark:text-emerald-400 font-bold">${displayTP}</td>
+        <td class="px-3 py-3 font-medium">${isRunning ? '<span class="text-amber-500 italic">Floating</span>' : (item.Exit || 0)}</td>
+        <td class="px-3 py-3 font-semibold">${item.Lot || 0.01}</td>
+        <td class="px-3 py-3 font-medium">${computedRR}</td>
+        <td class="px-3 py-3 font-extrabold ${isRunning ? 'text-amber-500' : (isProfit ? 'text-emerald-500' : 'text-rose-500')}">
+          ${isRunning ? '⏳ Floating' : ((isProfit ? '+' : '') + formatIDR(pl))}
         </td>
-        <td class="px-4 py-3 font-medium">${item.Entry || 0}</td>
-        <td class="px-4 py-3 text-rose-500 dark:text-rose-400 font-bold">${displaySL}</td>
-        <td class="px-4 py-3 text-emerald-500 dark:text-emerald-400 font-bold">${displayTP}</td>
-        <td class="px-4 py-3 font-medium">${isRunning ? '<span class="text-amber-500 italic">Floating</span>' : (item.Exit || 0)}</td>
-        <td class="px-4 py-3 font-semibold">${item.Lot || 0.01}</td>
-        <td class="px-4 py-3 font-extrabold ${isRunning ? 'text-amber-500' : (isProfit ? 'text-emerald-500' : 'text-rose-500')}">
-          ${isRunning ? '⏳ Running...' : ((isProfit ? '+' : '') + formatIDR(pl))}
-        </td>
-        <td class="px-4 py-3 font-medium">${item.RR || '1:2'}</td>
-        <td class="px-4 py-3 text-right">
+        <td class="px-3 py-3">${statusBadge}</td>
+        <td class="px-3 py-3 max-w-[150px] truncate text-zinc-400" title="${item.Catatan || ''}">${item.Catatan || '-'}</td>
+        <td class="px-3 py-3 text-right">
           <div class="flex justify-end gap-1.5 items-center">
             ${isRunning ? `
               <button onclick="closePositionTrade('${item.TradingID}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold shadow-sm transition flex items-center gap-1">
@@ -710,6 +796,7 @@ function renderTradingTable() {
   }).join('');
 
   renderPagination();
+  updateBatchDeleteButtonState();
 }
 
 function renderPagination() {
@@ -752,7 +839,27 @@ function appendThousands() {
   updateNominalPreview('input-profitloss', 'profitloss-preview');
 }
 
-// Profit vs Loss Toggle Handler (Otomatis atur Status & Exit Price jika diklik)
+function useLivePriceForExit() {
+  const exitInput = document.getElementById('input-exit');
+  const livePrice = tradingState.currentLivePrice;
+  const statusInput = document.getElementById('input-status');
+
+  if (exitInput && livePrice > 0) {
+    const pair = (document.getElementById('input-pair')?.value || 'XAUUSD').toUpperCase();
+    const decimals = (pair.includes('XAU') || pair.includes('JPY')) ? 2 : (pair.includes('BTC') ? 1 : 4);
+    exitInput.value = livePrice.toFixed(decimals);
+    if (statusInput && statusInput.value === 'RUNNING') {
+      statusInput.value = 'CLOSED';
+      toggleStatusMode();
+    }
+    onExitPriceInput();
+    showToast(`Exit Price diisi dengan harga Live saat ini: $${livePrice.toFixed(decimals)}`, 'success');
+  } else {
+    showToast('Harga Live saat ini belum tersedia.', 'warning');
+  }
+}
+
+// Profit vs Loss Toggle Handler (Otomatis atur Status & Exit Price ke Harga Live saat diklik)
 function setPLOutcome(type, isUserClick = true) {
   tradingState.plType = type;
   const btnProfit = document.getElementById('btn-pl-profit');
@@ -765,13 +872,23 @@ function setPLOutcome(type, isUserClick = true) {
     if (btnProfit) btnProfit.className = 'flex-1 py-2 font-bold rounded-xl bg-emerald-600 text-white transition shadow-sm flex items-center justify-center gap-1';
     if (btnLoss) btnLoss.className = 'flex-1 py-2 font-semibold rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-300 transition flex items-center justify-center gap-1';
     
-    // Jika diklik langsung oleh user, otomatis atur Status ke CLOSED dan Exit Price ke TP
+    // Jika diklik langsung oleh user, otomatis atur Status ke CLOSED dan Exit Price ke Harga Live (atau TP)
     if (isUserClick) {
       if (statusInput) statusInput.value = 'CLOSED';
       toggleStatusMode();
+      const livePrice = tradingState.currentLivePrice;
       const tpVal = document.getElementById('input-tp')?.value;
-      if (tpVal && exitInput) {
-        exitInput.value = tpVal;
+      const pair = (document.getElementById('input-pair')?.value || 'XAUUSD').toUpperCase();
+      const decimals = (pair.includes('XAU') || pair.includes('JPY')) ? 2 : (pair.includes('BTC') ? 1 : 4);
+
+      if (exitInput) {
+        if (livePrice > 0) {
+          exitInput.value = livePrice.toFixed(decimals);
+          showToast(`Exit Price diisi dengan Harga Live saat ini: $${livePrice.toFixed(decimals)} (PROFIT)`, 'success');
+        } else if (tpVal) {
+          exitInput.value = tpVal;
+          showToast('Exit Price diisi dengan harga Take Profit (TP).', 'info');
+        }
       }
     }
 
@@ -782,13 +899,23 @@ function setPLOutcome(type, isUserClick = true) {
     if (btnLoss) btnLoss.className = 'flex-1 py-2 font-bold rounded-xl bg-rose-600 text-white transition shadow-sm flex items-center justify-center gap-1';
     if (btnProfit) btnProfit.className = 'flex-1 py-2 font-semibold rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-300 transition flex items-center justify-center gap-1';
 
-    // Jika diklik langsung oleh user, otomatis atur Status ke CLOSED dan Exit Price ke SL
+    // Jika diklik langsung oleh user, otomatis atur Status ke CLOSED dan Exit Price ke Harga Live (atau SL)
     if (isUserClick) {
       if (statusInput) statusInput.value = 'CLOSED';
       toggleStatusMode();
+      const livePrice = tradingState.currentLivePrice;
       const slVal = document.getElementById('input-sl')?.value;
-      if (slVal && exitInput) {
-        exitInput.value = slVal;
+      const pair = (document.getElementById('input-pair')?.value || 'XAUUSD').toUpperCase();
+      const decimals = (pair.includes('XAU') || pair.includes('JPY')) ? 2 : (pair.includes('BTC') ? 1 : 4);
+
+      if (exitInput) {
+        if (livePrice > 0) {
+          exitInput.value = livePrice.toFixed(decimals);
+          showToast(`Exit Price diisi dengan Harga Live saat ini: $${livePrice.toFixed(decimals)} (LOSS)`, 'warning');
+        } else if (slVal) {
+          exitInput.value = slVal;
+          showToast('Exit Price diisi dengan harga Stop Loss (SL).', 'info');
+        }
       }
     }
 
@@ -943,15 +1070,16 @@ function openTradingModal(tradingID = null) {
       document.getElementById('input-catatan').value = item.Catatan || '';
     }
   } else {
+    const appSettings = typeof getAppSettings === 'function' ? getAppSettings() : {};
     title.textContent = 'Tambah Progress Trading';
     document.getElementById('input-tanggal').value = new Date().toISOString().split('T')[0];
-    document.getElementById('input-pair').value = 'XAUUSD';
+    document.getElementById('input-pair').value = appSettings.defaultPair || 'XAUUSD';
     document.getElementById('input-status').value = 'RUNNING';
-    document.getElementById('input-lot').value = '0.01';
-    document.getElementById('input-rr').value = '1:2';
+    document.getElementById('input-lot').value = appSettings.defaultLot || 0.01;
+    document.getElementById('input-rr').value = appSettings.defaultRR || '1:2';
     setPLOutcome('PROFIT');
 
-    // Jika ada harga live, otomatis isi Entry & kalkulasi SL (-50p) & TP langsung ke VALUE input!
+    // Jika ada harga live, otomatis isi Entry & kalkulasi SL & TP langsung ke VALUE input!
     if (tradingState.currentLivePrice > 0) {
       const entryInput = document.getElementById('input-entry');
       if (entryInput) {
@@ -971,7 +1099,18 @@ function closePositionTrade(tradingID) {
   openTradingModal(tradingID);
   document.getElementById('input-status').value = 'CLOSED';
   toggleStatusMode();
-  showToast('Tentukan Exit Price dan Hasil Trade untuk menutup posisi ini.', 'info');
+  
+  const exitInput = document.getElementById('input-exit');
+  const livePrice = tradingState.currentLivePrice;
+  if (exitInput && livePrice > 0) {
+    const pair = (document.getElementById('input-pair')?.value || 'XAUUSD').toUpperCase();
+    const decimals = (pair.includes('XAU') || pair.includes('JPY')) ? 2 : (pair.includes('BTC') ? 1 : 4);
+    exitInput.value = livePrice.toFixed(decimals);
+    onExitPriceInput();
+    showToast(`Exit Price diisi otomatis dengan Harga Live saat ini: $${livePrice.toFixed(decimals)}`, 'info');
+  } else {
+    showToast('Tentukan Exit Price dan Hasil Trade untuk menutup posisi ini.', 'info');
+  }
 }
 
 function closeTradingModal() {
@@ -982,6 +1121,34 @@ function closeTradingModal() {
 async function saveTradingForm(e) {
   e.preventDefault();
 
+  const buySell = document.getElementById('input-buysell').value;
+  const entryVal = Number(document.getElementById('input-entry').value) || 0;
+  const slVal = Number(document.getElementById('input-sl').value) || 0;
+  const tpVal = Number(document.getElementById('input-tp').value) || 0;
+
+  // Validasi Arah SL dan TP Logis
+  if (entryVal > 0) {
+    if (buySell === 'SELL') {
+      if (slVal > 0 && slVal <= entryVal) {
+        showToast('Untuk posisi SELL, Stop Loss (SL) harus lebih besar dari harga Entry.', 'warning');
+        return;
+      }
+      if (tpVal > 0 && tpVal >= entryVal) {
+        showToast('Untuk posisi SELL, Take Profit (TP) harus lebih kecil dari harga Entry.', 'warning');
+        return;
+      }
+    } else if (buySell === 'BUY') {
+      if (slVal > 0 && slVal >= entryVal) {
+        showToast('Untuk posisi BUY, Stop Loss (SL) harus lebih kecil dari harga Entry.', 'warning');
+        return;
+      }
+      if (tpVal > 0 && tpVal <= entryVal) {
+        showToast('Untuk posisi BUY, Take Profit (TP) harus lebih besar dari harga Entry.', 'warning');
+        return;
+      }
+    }
+  }
+
   const statusVal = document.getElementById('input-status').value;
   let finalPL = 0;
 
@@ -990,19 +1157,23 @@ async function saveTradingForm(e) {
     finalPL = tradingState.plType === 'PROFIT' ? Math.abs(rawPL) : -Math.abs(rawPL);
   }
 
+  const calculatedRR = (entryVal > 0 && slVal > 0 && tpVal > 0)
+    ? calculateActualRR(entryVal, slVal, tpVal, document.getElementById('input-rr').value || '1:2')
+    : (document.getElementById('input-rr').value || '1:2');
+
   const payload = {
     TradingID: tradingState.editingID,
     Tanggal: document.getElementById('input-tanggal').value,
     Pair: document.getElementById('input-pair').value.toUpperCase(),
-    BuySell: document.getElementById('input-buysell').value,
+    BuySell: buySell,
     Status: statusVal,
-    Entry: Number(document.getElementById('input-entry').value) || 0,
-    SL: Number(document.getElementById('input-sl').value) || 0,
-    TP: Number(document.getElementById('input-tp').value) || 0,
+    Entry: entryVal,
+    SL: slVal,
+    TP: tpVal,
     Exit: Number(document.getElementById('input-exit').value) || 0,
     Lot: Number(document.getElementById('input-lot').value) || 0.01,
     ProfitLoss: finalPL,
-    RR: document.getElementById('input-rr').value || '1:2',
+    RR: calculatedRR,
     Catatan: document.getElementById('input-catatan').value
   };
 
@@ -1036,5 +1207,66 @@ async function deleteTrade(tradingID) {
     await loadTradingData();
   } else {
     showToast(res.message || 'Gagal menghapus data.', 'error');
+  }
+}
+
+// Batch Delete (Bulk Delete) Engine Logic
+function toggleSelectAllTrading(checked) {
+  const checkboxes = document.querySelectorAll('.trading-row-checkbox');
+  checkboxes.forEach(cb => {
+    cb.checked = checked;
+  });
+  updateBatchDeleteButtonState();
+}
+
+function getSelectedTradingIDs() {
+  const checkedBoxes = document.querySelectorAll('.trading-row-checkbox:checked');
+  return Array.from(checkedBoxes).map(cb => cb.value).filter(Boolean);
+}
+
+function updateBatchDeleteButtonState() {
+  const btn = document.getElementById('btn-batch-delete');
+  const label = document.getElementById('batch-delete-label');
+  const selectAll = document.getElementById('select-all-trading');
+  const selectedIDs = getSelectedTradingIDs();
+  const allBoxes = document.querySelectorAll('.trading-row-checkbox');
+
+  if (selectAll && allBoxes.length > 0) {
+    selectAll.checked = selectedIDs.length === allBoxes.length;
+  } else if (selectAll) {
+    selectAll.checked = false;
+  }
+
+  if (btn && label) {
+    const count = selectedIDs.length;
+    label.textContent = `Hapus Terpilih (${count})`;
+    if (count > 0) {
+      btn.disabled = false;
+    } else {
+      btn.disabled = true;
+    }
+  }
+}
+
+async function batchDeleteTrades() {
+  const selectedIDs = getSelectedTradingIDs();
+  if (selectedIDs.length === 0) {
+    showToast('Pilih setidaknya 1 baris data trading untuk dihapus.', 'warning');
+    return;
+  }
+
+  if (!confirm(`Apakah Anda yakin ingin menghapus ${selectedIDs.length} data trading yang dipilih sekaligus?`)) {
+    return;
+  }
+
+  showLoading(true);
+  const res = await apiCall('batchDeleteTrading', { tradingIDs: selectedIDs });
+  showLoading(false);
+
+  if (res && res.success) {
+    showToast(res.message || `Berhasil menghapus ${selectedIDs.length} data trading.`, 'success');
+    await loadTradingData();
+  } else {
+    showToast(res ? res.message : 'Gagal menghapus data secara masal.', 'error');
   }
 }

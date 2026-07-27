@@ -33,10 +33,11 @@ function initUserInfo() {
   if (session) {
     const nameEl = document.getElementById('user-display-name');
     const roleEl = document.getElementById('user-display-role');
-    if (nameEl) nameEl.textContent = session.username;
-    if (roleEl) roleEl.textContent = session.role;
+    if (nameEl) nameEl.textContent = session.username || 'User';
+    if (roleEl) roleEl.textContent = session.role || 'Member';
 
-    if (session.role === 'Super Admin' || session.role === 'admin' || session.username.toLowerCase() === 'wansmin' || session.username.toLowerCase() === 'admin') {
+    const usernameLower = (session.username || '').toLowerCase();
+    if (session.role === 'Super Admin' || session.role === 'admin' || usernameLower === 'wansmin' || usernameLower === 'admin') {
       const navLink = document.getElementById('nav-admin-link');
       if (navLink) navLink.classList.remove('hidden');
       const mobileLink = document.getElementById('mobile-admin-link');

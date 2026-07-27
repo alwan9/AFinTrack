@@ -38,7 +38,7 @@ function toggleTheme() {
 }
 
 function updateThemeIcon(theme) {
-  const btn = document.getElementById('btn-theme-toggle');
+  const btn = document.getElementById('btn-theme-toggle') || document.getElementById('theme-toggle');
   if (!btn) return;
   btn.innerHTML = theme === 'dark'
     ? '<iconify-icon icon="lucide:moon" class="text-lg text-indigo-300 align-middle"></iconify-icon>'
@@ -89,29 +89,84 @@ function updatePrivacyIcon(active) {
   btn.title = active ? 'Tampilkan Nominal Saldo' : 'Sembunyikan Nominal Saldo';
 }
 
-function formatPrivacyIDR(amount) {
-  if (isPrivacyMode()) {
-    return 'Rp •••••••';
-  }
-  return formatIDR(amount);
+// Dynamic Realtime USD/IDR Global Exchange Rate Engine
+const EXCHANGE_RATE_KEY = 'AFINTRACK_USD_IDR_RATE';
+
+function getLiveUsdIdrRate() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(EXCHANGE_RATE_KEY));
+    if (cached && cached.rate > 0) {
+      return cached.rate;
+    }
+  } catch (e) {}
+  return 16250; // Fallback rate dasar
 }
 
-// Inisialisasi Tema & Privacy saat DOM Siap
+async function fetchLiveExchangeRate(forceRefresh = false) {
+  try {
+    const cached = JSON.parse(localStorage.getItem(EXCHANGE_RATE_KEY));
+    if (!forceRefresh && cached && cached.rate && cached.timestamp && (Date.now() - cached.timestamp < 30 * 60 * 1000)) {
+      return cached.rate;
+    }
+
+    const res = await fetch('https://open.er-api.com/v6/latest/USD');
+    const data = await res.json();
+    if (data && data.rates && data.rates.IDR) {
+      const rate = parseFloat(data.rates.IDR);
+      localStorage.setItem(EXCHANGE_RATE_KEY, JSON.stringify({
+        rate: rate,
+        timestamp: Date.now()
+      }));
+      return rate;
+    }
+  } catch (e) {
+    console.warn('[ExchangeRate] Live fetch failed, using fallback:', e);
+  }
+  return getLiveUsdIdrRate();
+}
+
+function formatPrivacyIDR(amount, isUsdBase = false) {
+  const settings = typeof getAppSettings === 'function' ? getAppSettings() : {};
+  const currSymbol = (settings.currency === 'USD') ? '$' : 'Rp';
+  if (isPrivacyMode()) {
+    return `${currSymbol} •••••••`;
+  }
+  return formatIDR(amount, isUsdBase);
+}
+
+// Inisialisasi Tema & Privacy & Live Kurs saat DOM Siap
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   updatePrivacyIcon(isPrivacyMode());
   initOfflineSyncEngine();
   initPwaInstallBanner();
+  fetchLiveExchangeRate();
 });
 
-// Format Currency (IDR)
-function formatIDR(amount) {
+// Format Currency (Dinamis IDR / USD dari Settings dengan Kurs Global Realtime)
+function formatIDR(amount, isUsdBase = false) {
   const num = parseFloat(amount) || 0;
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0
-  }).format(num);
+  const settings = typeof getAppSettings === 'function' ? getAppSettings() : {};
+  const curr = settings.currency || 'IDR';
+  const rate = getLiveUsdIdrRate();
+
+  if (curr === 'USD') {
+    // Jika mata uang aktif USD
+    const valInUSD = isUsdBase ? num : (rate > 0 ? (num / rate) : (num / 16250));
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 2
+    }).format(valInUSD);
+  } else {
+    // Jika mata uang aktif IDR
+    const valInIDR = isUsdBase ? (num * rate) : num;
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      maximumFractionDigits: 0
+    }).format(valInIDR);
+  }
 }
 
 // Sanitasi XSS untuk Tampilan Frontend
@@ -447,6 +502,39 @@ async function triggerPwaInstall() {
   }
 }
 
+// ⚙️ Application Settings Manager
+const APP_SETTINGS_KEY = 'AFINTRACK_APP_SETTINGS';
+
+function getAppSettings() {
+  try {
+    const defaultSettings = {
+      currency: 'IDR',
+      defaultRR: '1:2',
+      defaultSLPips: 50,
+      defaultLot: 0.01,
+      defaultPair: 'XAUUSD'
+    };
+    const saved = JSON.parse(localStorage.getItem(APP_SETTINGS_KEY));
+    return saved ? { ...defaultSettings, ...saved } : defaultSettings;
+  } catch (e) {
+    return {
+      currency: 'IDR',
+      defaultRR: '1:2',
+      defaultSLPips: 50,
+      defaultLot: 0.01,
+      defaultPair: 'XAUUSD'
+    };
+  }
+}
+
+function saveAppSettings(settings) {
+  try {
+    localStorage.setItem(APP_SETTINGS_KEY, JSON.stringify(settings));
+  } catch (e) {
+    console.warn('[AppSettings] Failed to save settings:', e);
+  }
+}
+
 /**
  * Dynamic Permission Guard & Menu Visibility Controller
  */
@@ -467,12 +555,17 @@ function applyPermissionGuards(pageName) {
   const navDash = document.getElementById('nav-dash-link');
   const navTrade = document.getElementById('nav-trade-link');
   const navFin = document.getElementById('nav-fin-link');
+  const navSettings = document.getElementById('nav-settings-link');
   const navAdmin = document.getElementById('nav-admin-link');
 
   const mobileDash = document.getElementById('mobile-dash-link');
   const mobileTrade = document.getElementById('mobile-trade-link');
   const mobileFin = document.getElementById('mobile-fin-link');
+  const mobileSettings = document.getElementById('mobile-settings-link');
   const mobileAdmin = document.getElementById('mobile-admin-link');
+
+  if (navSettings) navSettings.classList.remove('hidden');
+  if (mobileSettings) mobileSettings.classList.remove('hidden');
 
   if (!isSA && perms.Dashboard === false) {
     if (navDash) navDash.classList.add('hidden');
