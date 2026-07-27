@@ -213,3 +213,12 @@ function resetAllSettingsToDefault() {
   initSettingsUI();
   showToast('Pengaturan telah di-reset ke default.', 'success');
 }
+
+function copySiriShortcutLink() {
+  const link = window.location.origin + window.location.pathname.replace('settings.html', 'finance.html') + '?voice=true';
+  navigator.clipboard.writeText(link).then(() => {
+    showToast('✅ URL Pintasan Voice Assistant berhasil disalin ke clipboard!', 'success');
+  }).catch(() => {
+    showToast(`URL Pintasan: ${link}`, 'info');
+  });
+}

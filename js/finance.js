@@ -21,9 +21,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function checkUrlActions() {
   const params = new URLSearchParams(window.location.search);
+
+  // 1. Pemicu Perintah Suara Otomatis dari Pintasan Siri / Google Assistant (?voice=true)
+  if (params.get('voice') === 'true') {
+    setTimeout(() => {
+      startVoiceInputFinance();
+    }, 600);
+  }
+
+  // 2. Pre-filled Parameters via Siri / Assistant URL Link
   if (params.get('action') === 'add') {
     setTimeout(() => {
-      if (typeof openFinanceModal === 'function') openFinanceModal();
+      openFinanceModal();
+      if (params.get('type')) {
+        const typeVal = params.get('type').toUpperCase();
+        document.getElementById('input-tipe').value = typeVal === 'IN' || typeVal === 'PEMASUKAN' ? 'PEMASUKAN' : 'PENGELUARAN';
+      }
+      if (params.get('category')) document.getElementById('input-kategori').value = params.get('category');
+      if (params.get('amount')) {
+        document.getElementById('input-nominal').value = params.get('amount');
+        updateNominalPreview('input-nominal', 'nominal-preview');
+      }
+      if (params.get('desc')) document.getElementById('input-keterangan').value = params.get('desc');
     }, 500);
   }
 }
@@ -309,4 +328,148 @@ async function deleteFinance(financeID) {
   } else {
     showToast(res.message || 'Gagal menghapus data.', 'error');
   }
+}
+
+// 🎙️ Voice Assistant Integration Engine (Siri & Google Assistant Web Speech Recognition API)
+function parseIndonesianFinanceSpeech(transcript) {
+  if (!transcript || typeof transcript !== 'string') return null;
+
+  const raw = transcript.toLowerCase().trim();
+
+  // 1. Tentukan Tipe: PEMASUKAN vs PENGELUARAN
+  let type = 'PENGELUARAN';
+  if (raw.includes('pemasukan') || raw.includes('masuk') || raw.includes('gaji') || raw.includes('dapat') || raw.includes('terima') || raw.includes('freelance') || raw.includes('bonus')) {
+    type = 'PEMASUKAN';
+  } else if (raw.includes('pengeluaran') || raw.includes('keluar') || raw.includes('bayar') || raw.includes('beli') || raw.includes('biaya')) {
+    type = 'PENGELUARAN';
+  }
+
+  // 2. Ekstraksi Nominal
+  let amount = 0;
+  let text = raw
+    .replace(/sejuta/g, '1000000')
+    .replace(/seribu/g, '1000')
+    .replace(/seratus/g, '100')
+    .replace(/sepuluh/g, '10')
+    .replace(/setengah juta/g, '500000')
+    .replace(/seperempat juta/g, '250000');
+
+  const millionMatch = text.match(/(\d+(?:[\.,]\d+)?)\s*(?:juta|jt)/i);
+  const thousandMatch = text.match(/(\d+(?:[\.,]\d+)?)\s*(?:ribu|rb|k)/i);
+  const plainNumberMatch = text.match(/\b(\d{4,9})\b/);
+
+  if (millionMatch) {
+    const num = parseFloat(millionMatch[1].replace(',', '.'));
+    amount = Math.round(num * 1000000);
+  } else if (thousandMatch) {
+    const num = parseFloat(thousandMatch[1].replace(',', '.'));
+    amount = Math.round(num * 1000);
+  } else if (plainNumberMatch) {
+    amount = parseInt(plainNumberMatch[1], 10);
+  } else {
+    const numbersMap = {
+      'satu': 1, 'dua': 2, 'tiga': 3, 'empat': 4, 'lima': 5,
+      'enam': 6, 'tujuh': 7, 'delapan': 8, 'sembilan': 9
+    };
+    for (const [word, num] of Object.entries(numbersMap)) {
+      if (text.includes(`${word} juta`)) { amount = num * 1000000; break; }
+      if (text.includes(`${word} ratus ribu`)) { amount = num * 100000; break; }
+      if (text.includes(`${word} puluh ribu`)) { amount = num * 10000; break; }
+      if (text.includes(`${word} ribu`)) { amount = num * 1000; break; }
+    }
+  }
+
+  // 3. Deteksi Kategori
+  let kategori = 'Lain-lain';
+  if (raw.includes('gaji') || raw.includes('upah') || raw.includes('salary')) {
+    kategori = 'Gaji';
+  } else if (raw.includes('freelance') || raw.includes('proyek') || raw.includes('project')) {
+    kategori = 'Freelance';
+  } else if (raw.includes('trading') || raw.includes('profit') || raw.includes('crypto') || raw.includes('saham')) {
+    kategori = 'Trading';
+  } else if (raw.includes('investasi') || raw.includes('reksadana')) {
+    kategori = 'Investasi';
+  } else if (raw.includes('makan') || raw.includes('minum') || raw.includes('kopi') || raw.includes('nasi') || raw.includes('warung') || raw.includes('resto')) {
+    kategori = 'Makan';
+  } else if (raw.includes('transport') || raw.includes('bensin') || raw.includes('gojek') || raw.includes('grab') || raw.includes('parkir') || raw.includes('tol')) {
+    kategori = 'Transport';
+  }
+
+  // 4. Keterangan / Note
+  let cleanDesc = raw
+    .replace(/catat/g, '')
+    .replace(/pemasukan/g, '')
+    .replace(/pengeluaran/g, '')
+    .replace(/sebesar/g, '')
+    .replace(/sebanyak/g, '')
+    .replace(/untuk/g, '')
+    .replace(/dari/g, '')
+    .replace(/rupiah/g, '')
+    .replace(/(\d+(?:[\.,]\d+)?)\s*(?:juta|jt|ribu|rb|k)/gi, '')
+    .replace(/\b\d+\b/g, '')
+    .trim();
+
+  if (!cleanDesc) {
+    cleanDesc = transcript;
+  } else {
+    cleanDesc = cleanDesc.charAt(0).toUpperCase() + cleanDesc.slice(1);
+  }
+
+  return {
+    tipe: type,
+    nominal: amount,
+    kategori: kategori,
+    keterangan: cleanDesc,
+    originalTranscript: transcript
+  };
+}
+
+function startVoiceInputFinance() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    showToast('Browser Anda belum mendukung Web Speech API (Gunakan Safari di iOS / Chrome di Android).', 'warning');
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'id-ID';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  showToast('🎙️ Mendengarkan suara... Ucapkan perintah (cth: "Pengeluaran 50 ribu makan siang")', 'info');
+
+  const btnVoice = document.getElementById('btn-voice-finance');
+  if (btnVoice) btnVoice.classList.add('animate-pulse', 'ring-4', 'ring-amber-400');
+
+  recognition.start();
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    showToast(`🎙️ Suara terdeteksi: "${transcript}"`, 'success');
+
+    const parsed = parseIndonesianFinanceSpeech(transcript);
+    if (parsed) {
+      openFinanceModal();
+
+      document.getElementById('input-tipe').value = parsed.tipe;
+      document.getElementById('input-kategori').value = parsed.kategori;
+      if (parsed.nominal > 0) {
+        document.getElementById('input-nominal').value = parsed.nominal;
+        updateNominalPreview('input-nominal', 'nominal-preview');
+      }
+      document.getElementById('input-keterangan').value = parsed.keterangan;
+
+      showToast(`✅ Transaksi ${parsed.tipe} Rp ${new Intl.NumberFormat('id-ID').format(parsed.nominal)} berhasil diisi otomatis!`, 'success');
+    }
+  };
+
+  recognition.onerror = (event) => {
+    console.warn('[VoiceInput] Error:', event.error);
+    showToast(`Mendengar suara terhenti (${event.error}). Silakan coba lagi.`, 'warning');
+  };
+
+  recognition.onend = () => {
+    if (btnVoice) btnVoice.classList.remove('animate-pulse', 'ring-4', 'ring-amber-400');
+  };
 }

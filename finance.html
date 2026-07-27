@@ -90,11 +90,20 @@
         </h2>
         <p class="text-xs text-zinc-400">Pemasukan, pengeluaran harian, gaji, freelance, dan investasi.</p>
       </div>
-      <button id="btn-add-finance" onclick="openFinanceModal()"
-        class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2">
-        <iconify-icon icon="lucide:plus" class="text-base"></iconify-icon>
-        <span>Transaksi Keuangan</span>
-      </button>
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="btn-voice-finance" type="button" onclick="startVoiceInputFinance()"
+          class="px-4 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2"
+          title="Input Transaksi dengan Perintah Suara Bahasa Indonesia (Siri / Google Assistant)">
+          <iconify-icon icon="lucide:mic" class="text-base text-amber-300"></iconify-icon>
+          <span>Input Suara (Voice Assistant)</span>
+        </button>
+
+        <button id="btn-add-finance" onclick="openFinanceModal()"
+          class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2">
+          <iconify-icon icon="lucide:plus" class="text-base"></iconify-icon>
+          <span>Transaksi Keuangan</span>
+        </button>
+      </div>
     </div>
 
     <!-- Quick Stats Bar -->
@@ -177,7 +186,13 @@
     <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4">
       
       <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3">
-        <h3 id="modal-finance-title" class="text-base font-bold text-zinc-900 dark:text-zinc-100">Tambah Transaksi Keuangan</h3>
+        <div class="flex items-center gap-2">
+          <h3 id="modal-finance-title" class="text-base font-bold text-zinc-900 dark:text-zinc-100">Tambah Transaksi Keuangan</h3>
+          <button type="button" onclick="startVoiceInputFinance()" class="px-2 py-0.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-lg text-[10px] font-bold shadow-sm transition flex items-center gap-1 hover:opacity-90" title="Klik untuk mendiktekan perintah suara (Siri / Assistant)">
+            <iconify-icon icon="lucide:mic" class="text-xs text-amber-300"></iconify-icon>
+            <span>Dikte Suara</span>
+          </button>
+        </div>
         <button onclick="closeFinanceModal()" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
           <iconify-icon icon="lucide:x" class="text-lg"></iconify-icon>
         </button>

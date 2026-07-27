@@ -292,6 +292,66 @@
         </div>
       </div>
 
+      <!-- Section 6: Integrasi Voice Assistant (Siri & Google Assistant) -->
+      <div
+        class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm space-y-5 lg:col-span-2">
+        <div class="flex items-center gap-3 border-b border-zinc-200 dark:border-zinc-800 pb-3">
+          <div class="p-2.5 rounded-2xl bg-gradient-to-r from-violet-600/20 to-indigo-600/20 text-indigo-500 border border-indigo-500/20">
+            <iconify-icon icon="lucide:mic" class="text-xl text-amber-400"></iconify-icon>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+              <span>Integrasi Perintah Suara (Siri & Google Assistant)</span>
+              <span class="px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500 border border-indigo-500/30 text-[10px] font-bold">Voice AI</span>
+            </h3>
+            <p class="text-[11px] text-zinc-400">Catat transaksi keuangan cukup dengan berbicara ke HP (Speech Recognition Bahasa Indonesia).</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <!-- Petunjuk Siri & Google -->
+          <div class="p-4 bg-zinc-50 dark:bg-zinc-950/80 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-3">
+            <h4 class="font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5 text-xs">
+              <iconify-icon icon="lucide:smartphone" class="text-indigo-500"></iconify-icon>
+              <span>Cara Menggunakan Perintah Suara di HP</span>
+            </h4>
+            <ol class="list-decimal list-inside space-y-1.5 text-zinc-600 dark:text-zinc-400 text-[11px] leading-relaxed">
+              <li>Buka halaman <strong>Keuangan</strong> di browser/PWA HP.</li>
+              <li>Klik tombol 🎙️ <strong>Input Suara (Voice Assistant)</strong>.</li>
+              <li>Ucapkan kalimat transaksi dalam Bahasa Indonesia.</li>
+              <li>Sistem akan otomatis mendeteksi Nominal, Tipe, Kategori, dan Keterangan lalu mengisi form modal secara otomatis!</li>
+            </ol>
+          </div>
+
+          <!-- Contoh Kalimat Perintah Suara -->
+          <div class="p-4 bg-zinc-50 dark:bg-zinc-950/80 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-3">
+            <h4 class="font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5 text-xs">
+              <iconify-icon icon="lucide:sparkles" class="text-amber-500"></iconify-icon>
+              <span>Contoh Dikte Perintah Suara yang Didukung</span>
+            </h4>
+            <div class="space-y-1.5 text-[11px]">
+              <div class="p-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 font-mono text-emerald-600 dark:text-emerald-400">
+                🗣️ "Catat pemasukan 2 juta lima ratus ribu gaji bulanan"
+              </div>
+              <div class="p-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 font-mono text-rose-500">
+                🗣️ "Pengeluaran 50 ribu makan siang nasi padang"
+              </div>
+              <div class="p-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 font-mono text-indigo-500 dark:text-indigo-400">
+                🗣️ "Catat pengeluaran 100 ribu bensin motor"
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          <span class="text-[11px] text-zinc-400">Punya Pintasan Siri / Routine Google Assistant? Gunakan link URL khusus berikut untuk langsung memicu mic:</span>
+          <button onclick="copySiriShortcutLink()" class="px-4 py-2 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-300 font-bold rounded-xl transition text-xs flex items-center gap-1.5 whitespace-nowrap">
+            <iconify-icon icon="lucide:copy" class="text-sm"></iconify-icon>
+            <span>Salin URL Pintasan Siri / Assistant</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Section 5: Backup & Reset Data -->
       <div
         class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm space-y-5 lg:col-span-2">
