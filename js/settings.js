@@ -2,11 +2,11 @@
  * AFinTrack - Settings Module Logic & System Preferences Manager
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   checkAuthGuard();
   applyPermissionGuards('Settings');
   initUserInfo();
-  initSettingsUI();
+  await initSettingsUI();
 });
 
 function initUserInfo() {
@@ -18,16 +18,31 @@ function initUserInfo() {
     if (roleEl) roleEl.textContent = session.role || 'Member';
 
     const usernameLower = (session.username || '').toLowerCase();
-    if (session.role === 'Super Admin' || session.role === 'admin' || usernameLower === 'wansmin' || usernameLower === 'admin') {
+    const isSuperAdmin = session.role === 'Super Admin' || session.role === 'admin' || usernameLower === 'wansmin' || usernameLower === 'admin';
+
+    if (isSuperAdmin) {
       const navLink = document.getElementById('nav-admin-link');
       if (navLink) navLink.classList.remove('hidden');
       const mobileLink = document.getElementById('mobile-admin-link');
       if (mobileLink) mobileLink.classList.remove('hidden');
     }
+
+    // Hanya Tampilkan Koneksi Server Backend jika Super Admin (wansmin)
+    const backendSection = document.getElementById('section-backend-server');
+    if (backendSection) {
+      if (isSuperAdmin) {
+        backendSection.classList.remove('hidden');
+      } else {
+        backendSection.classList.add('hidden');
+      }
+    }
   }
 }
 
-function initSettingsUI() {
+async function initSettingsUI() {
+  if (typeof syncAppSettingsFromBackend === 'function') {
+    await syncAppSettingsFromBackend();
+  }
   const settings = typeof getAppSettings === 'function' ? getAppSettings() : {};
 
   // 1. Tampilan
@@ -60,7 +75,7 @@ function initSettingsUI() {
   const pwaStatusText = document.getElementById('pwa-install-status-text');
   const isPwaInstalled = localStorage.getItem('AFINTRACK_PWA_INSTALLED') === 'true';
   if (pwaStatusText) {
-    pwaStatusText.textContent = isPwaInstalled ? '✅ Aplikasi Terinstall di HP' : '📱 PWA Siap Di-install';
+    pwaStatusText.textContent = isPwaInstalled ? 'Aplikasi Terinstall di HP' : 'PWA Siap Di-install';
   }
 
   // Update Tampilan Banner Kurs Live
@@ -80,7 +95,7 @@ async function updateLiveExchangeRateUI(force = false) {
   if (iconEl) iconEl.classList.remove('animate-spin');
   if (rate > 0) {
     const formattedRate = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(rate);
-    textEl.textContent = `⚡ Kurs Live: $1 USD = Rp ${formattedRate} (Global Market)`;
+    textEl.textContent = `Kurs Live: $1 USD = Rp ${formattedRate} (Global Market)`;
   } else {
     textEl.textContent = 'Gagal memuat kurs live (Menggunakan rate Rp 16.250).';
   }
@@ -88,13 +103,14 @@ async function updateLiveExchangeRateUI(force = false) {
 
 async function refreshLiveExchangeRateUI() {
   await updateLiveExchangeRateUI(true);
-  showToast('✅ Kurs Live USD/IDR berhasil diperbarui dari pasar global!', 'success');
+  showToast('Kurs Live USD/IDR berhasil diperbarui dari pasar global!', 'success');
 }
 
 function togglePrivacyModeFromSetting(enabled) {
-  localStorage.setItem('AFINTRACK_PRIVACY_MODE', enabled ? 'true' : 'false');
-  updatePrivacyIcon(enabled);
-  showToast(enabled ? 'Privacy Mode AKTIF (Saldo disembunyikan)' : 'Privacy Mode NONAKTIF', 'info');
+  const current = isPrivacyMode();
+  if (current !== enabled) {
+    togglePrivacyMode();
+  }
 }
 
 function saveAllSettingsFromUI() {
@@ -115,7 +131,7 @@ function saveAllSettingsFromUI() {
     localStorage.setItem('AFINTRACK_APP_SETTINGS', JSON.stringify(updatedSettings));
   }
 
-  showToast('✅ Semua pengaturan preferensi berhasil disimpan!', 'success');
+  showToast('Semua pengaturan preferensi berhasil disimpan!', 'success');
 }
 
 function triggerPwaInstallFromSettings() {
@@ -138,7 +154,7 @@ async function testServerConnectionUI() {
     if (res && res.success) {
       if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping';
       if (text) text.textContent = 'Server Terhubung (Response OK)';
-      showToast('✅ Koneksi ke Google Apps Script backend lancar!', 'success');
+      showToast('Koneksi ke Google Apps Script backend lancar!', 'success');
     } else {
       if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
       if (text) text.textContent = 'Server Responsif (Session Standby)';
@@ -153,28 +169,6 @@ async function testServerConnectionUI() {
   }
 }
 
-function exportDataJSON() {
-  const session = getSession() || {};
-  const settings = typeof getAppSettings === 'function' ? getAppSettings() : {};
-  const queue = typeof getOfflineQueue === 'function' ? getOfflineQueue() : [];
-
-  const exportPayload = {
-    app: 'AFinTrack',
-    exportedAt: new Date().toISOString(),
-    user: session.username || 'User',
-    settings: settings,
-    offlineQueue: queue
-  };
-
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
-  const downloadAnchor = document.createElement('a');
-  downloadAnchor.setAttribute("href", dataStr);
-  downloadAnchor.setAttribute("download", `AFinTrack_Backup_${new Date().toISOString().split('T')[0]}.json`);
-  document.body.appendChild(downloadAnchor);
-  downloadAnchor.click();
-  downloadAnchor.remove();
-
-  showToast('✅ File Cadangan Data (JSON) berhasil diunduh!', 'success');
 }
 
 function clearWebCookies() {
@@ -195,7 +189,7 @@ function clearWebCookies() {
     }
   }
 
-  showToast(`✅ Berhasil membersihkan cookie website.`, 'success');
+  showToast(`Berhasil membersihkan cookie website.`, 'success');
 }
 
 function clearOfflineQueueStorage() {
@@ -225,7 +219,7 @@ function copySiriShortcutLink() {
   const textToCopy = `[1. Webhook Direct Background (Zero-Click)]\n${webhookUrl}\n\n[2. PWA Auto-Mic Link]\n${pwaUrl}`;
 
   navigator.clipboard.writeText(textToCopy).then(() => {
-    showToast('✅ Pintasan URL Siri / Google Assistant (Zero-Click Direct to Sheet) berhasil disalin!', 'success');
+    showToast('Pintasan URL Siri / Google Assistant (Zero-Click Direct to Sheet) berhasil disalin!', 'success');
   }).catch(() => {
     showToast('Berhasil membuat URL Pintasan Siri / Assistant.', 'info');
   });

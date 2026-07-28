@@ -244,7 +244,7 @@ async function handleResetPasswordSubmit(e) {
   showLoading(false);
 
   if (res && res.success) {
-    showToast('Password pengguna berhasil direset! 🔑', 'success');
+    showToast('Password pengguna berhasil direset!', 'success');
     closeResetPasswordModal();
   } else {
     showToast(res ? (res.message || 'Gagal mereset password.') : 'Gagal mereset password.', 'error');

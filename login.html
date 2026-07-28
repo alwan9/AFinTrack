@@ -5,7 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login — AFinTrack Trading & Finance</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#4f46e5">
+  <script>
+    // Instant Auto-Redirect: Jika pengguna sudah login, langsung masuk ke Dashboard!
+    (function() {
+      try {
+        const hasSession = localStorage.getItem('AFINTRACK_ACTIVE_SESSION') || document.cookie.includes('AFINTRACK_AUTH_TOKEN');
+        if (hasSession) {
+          window.location.replace('dashboard.html');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
   <link rel="stylesheet" href="css/style.css">
@@ -108,7 +118,7 @@
         try {
           const sessionObj = JSON.parse(cachedSessionStr);
           saveSession(sessionObj);
-          showToast('🔓 Berhasil terverifikasi via PIN 4-digit!', 'success');
+          showToast('Berhasil terverifikasi via PIN 4-digit!', 'success');
           setTimeout(() => {
             window.location.href = './dashboard.html';
           }, 300);

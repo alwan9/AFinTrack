@@ -58,11 +58,6 @@
           <iconify-icon icon="lucide:shield-check"></iconify-icon>
           <span>Panel Admin</span>
         </a>
-        <a id="nav-settings-link" href="settings.html"
-          class="px-3.5 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-white dark:bg-zinc-900 rounded-lg shadow-sm flex items-center gap-1.5">
-          <iconify-icon icon="lucide:settings"></iconify-icon>
-          <span>Pengaturan</span>
-        </a>
       </nav>
 
       <div class="flex items-center gap-3">
@@ -77,6 +72,12 @@
           title="Toggle Theme">
           <iconify-icon icon="lucide:moon" class="text-lg text-indigo-300"></iconify-icon>
         </button>
+
+        <a id="nav-settings-link" href="settings.html"
+          class="p-2 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 rounded-xl transition text-base flex items-center justify-center"
+          title="Pengaturan Aplikasi">
+          <iconify-icon icon="lucide:settings" class="text-lg text-indigo-500"></iconify-icon>
+        </a>
 
         <div class="text-right hidden sm:block border-l border-zinc-200 dark:border-zinc-800 pl-3">
           <p id="user-display-name" class="text-xs font-bold text-zinc-800 dark:text-zinc-200">User</p>
@@ -257,16 +258,16 @@
         </div>
       </div>
 
-      <!-- Section 4: Backend Apps Script API Connection -->
-      <div
-        class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm space-y-5">
+      <!-- Section 4: Backend Apps Script API Connection (Super Admin Only) -->
+      <div id="section-backend-server"
+        class="hidden bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm space-y-5">
         <div class="flex items-center gap-3 border-b border-zinc-200 dark:border-zinc-800 pb-3">
           <div class="p-2.5 rounded-2xl bg-cyan-500/10 text-cyan-500 border border-cyan-500/20">
             <iconify-icon icon="lucide:server" class="text-xl"></iconify-icon>
           </div>
           <div>
             <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Koneksi Server Backend Apps Script</h3>
-            <p class="text-[11px] text-zinc-400">Uji status koneksi ke Google Spreadsheet & Apps Script Web App.</p>
+            <p class="text-[11px] text-zinc-400">Uji status koneksi ke Google Spreadsheet & Apps Script Web App (Khusus Super Admin).</p>
           </div>
         </div>
 
@@ -317,7 +318,7 @@
             </h4>
             <ol class="list-decimal list-inside space-y-1.5 text-zinc-600 dark:text-zinc-400 text-[11px] leading-relaxed">
               <li>Buka halaman <strong>Keuangan</strong> di browser/PWA HP.</li>
-              <li>Klik tombol 🎙️ <strong>Input Suara (Voice Assistant)</strong>.</li>
+              <li>Klik tombol <iconify-icon icon="lucide:mic" class="inline text-indigo-500"></iconify-icon> <strong>Input Suara (Voice Assistant)</strong>.</li>
               <li>Ucapkan kalimat transaksi dalam Bahasa Indonesia.</li>
               <li>Sistem akan otomatis mendeteksi Nominal, Tipe, Kategori, dan Keterangan lalu mengisi form modal secara otomatis!</li>
             </ol>
@@ -330,14 +331,17 @@
               <span>Contoh Dikte Perintah Suara yang Didukung</span>
             </h4>
             <div class="space-y-1.5 text-[11px]">
-              <div class="p-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 font-mono text-emerald-600 dark:text-emerald-400">
-                🗣️ "Catat pemasukan 2 juta lima ratus ribu gaji bulanan"
+              <div class="p-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                <iconify-icon icon="lucide:mic" class="text-emerald-500 text-sm"></iconify-icon>
+                <span>"Catat pemasukan 2 juta lima ratus ribu gaji bulanan"</span>
               </div>
-              <div class="p-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 font-mono text-rose-500">
-                🗣️ "Pengeluaran 50 ribu makan siang nasi padang"
+              <div class="p-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 font-mono text-rose-500 flex items-center gap-1.5">
+                <iconify-icon icon="lucide:mic" class="text-rose-500 text-sm"></iconify-icon>
+                <span>"Pengeluaran 50 ribu makan siang nasi padang"</span>
               </div>
-              <div class="p-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 font-mono text-indigo-500 dark:text-indigo-400">
-                🗣️ "Catat pengeluaran 100 ribu bensin motor"
+              <div class="p-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 font-mono text-indigo-500 dark:text-indigo-400 flex items-center gap-1.5">
+                <iconify-icon icon="lucide:mic" class="text-indigo-500 text-sm"></iconify-icon>
+                <span>"Catat pengeluaran 100 ribu bensin motor"</span>
               </div>
             </div>
           </div>
@@ -365,16 +369,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-          <button onclick="exportDataJSON()"
-            class="p-4 bg-zinc-50 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500 rounded-2xl transition text-left space-y-1">
-            <div class="text-indigo-500 font-bold flex items-center gap-1.5">
-              <iconify-icon icon="lucide:download" class="text-lg"></iconify-icon>
-              <span>Export BackUp (JSON)</span>
-            </div>
-            <p class="text-[11px] text-zinc-400">Unduh seluruh riwayat data lokal dalam format JSON.</p>
-          </button>
-
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
           <button onclick="clearWebCookies()"
             class="p-4 bg-zinc-50 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 hover:border-amber-500 rounded-2xl transition text-left space-y-1">
             <div class="text-amber-500 font-bold flex items-center gap-1.5">

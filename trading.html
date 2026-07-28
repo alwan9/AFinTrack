@@ -58,11 +58,6 @@
           <iconify-icon icon="lucide:shield-check"></iconify-icon>
           <span>Panel Admin</span>
         </a>
-        <a id="nav-settings-link" href="settings.html"
-          class="px-3.5 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition flex items-center gap-1.5">
-          <iconify-icon icon="lucide:settings"></iconify-icon>
-          <span>Pengaturan</span>
-        </a>
       </nav>
 
       <div class="flex items-center gap-3">
@@ -72,20 +67,15 @@
           <iconify-icon icon="lucide:eye" class="text-lg text-zinc-400"></iconify-icon>
         </button>
 
-        <button onclick="testMobileNotification()"
-          class="px-2.5 py-1.5 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl transition text-xs font-semibold flex items-center gap-1.5"
-          title="Klik untuk menguji Notifikasi HP (System Push Notification)">
-          <iconify-icon icon="lucide:bell-ring" class="text-sm text-amber-400"></iconify-icon>
-          <span class="hidden md:inline">Uji Notifikasi HP</span>
-        </button>
-
         <button id="btn-theme-toggle" onclick="toggleTheme()"
           class="p-2 text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition text-base flex items-center justify-center"
           title="Toggle Theme">
           <iconify-icon icon="lucide:moon" class="text-lg text-indigo-300"></iconify-icon>
         </button>
 
-        <a href="settings.html" class="p-2 text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition text-base flex items-center justify-center" title="Pengaturan Aplikasi">
+        <a id="nav-settings-link" href="settings.html"
+          class="p-2 text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition text-base flex items-center justify-center"
+          title="Pengaturan Aplikasi">
           <iconify-icon icon="lucide:settings" class="text-lg text-zinc-400"></iconify-icon>
         </a>
 
@@ -156,7 +146,7 @@
             <span>Live Chart & Analysis Tools</span>
           </h3>
           <p class="text-[11px] text-zinc-400">Gunakan toolbar kiri untuk menggambar Tren, Channel, Fibonacci,
-            Risk/Reward (Long/Short), dan klik bintang ⭐ untuk simpan Wishlist Toolbar.</p>
+            Risk/Reward (Long/Short), dan klik ikon bintang untuk simpan Wishlist Toolbar.</p>
         </div>
 
         <!-- Timeframe Quick Selector Buttons & Chart Size Control -->
@@ -205,6 +195,52 @@
       <div id="tradingview-widget-container"
         class="w-full h-[480px] rounded-2xl bg-zinc-950 overflow-hidden resize-y min-h-[400px] max-h-[950px] transition-[height] duration-300">
         <!-- Script TradingView disisipkan via js/trading.js -->
+      </div>
+    </div>
+
+    <!-- Live High Impact News Warning Banner (Auto Active <= 15 Mins) -->
+    <div id="news-warning-banner" class="hidden bg-gradient-to-r from-rose-500/20 via-amber-500/20 to-rose-500/20 border border-rose-500/40 rounded-3xl p-4 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-pulse">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-rose-500/20 text-rose-400 rounded-2xl border border-rose-500/30">
+          <iconify-icon icon="lucide:alert-triangle" class="text-2xl text-rose-400"></iconify-icon>
+        </div>
+        <div>
+          <h4 id="news-banner-title" class="text-sm font-bold text-rose-400">PERINGATAN BERITA HIGH IMPACT (15-MIN ALERT)!</h4>
+          <p id="news-banner-desc" class="text-xs text-zinc-200 mt-0.5">Berita NFP / CPI (USD) akan rilis dalam 15 menit. Waspadai pergerakan harga ekstrem!</p>
+        </div>
+      </div>
+      <button onclick="dismissNewsBanner()" class="px-4 py-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 text-xs font-bold rounded-xl border border-zinc-700 transition whitespace-nowrap">
+        Tutup Peringatan
+      </button>
+    </div>
+
+    <!-- High Impact Economic News Calendar Card -->
+    <div id="news-calendar-section" class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200 dark:border-zinc-800 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 rounded-2xl bg-rose-500/10 text-rose-500 border border-rose-500/20">
+            <iconify-icon icon="lucide:calendar-clock" class="text-xl"></iconify-icon>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+              <span>Kalender Berita High Impact (NFP, CPI, FOMC Alert)</span>
+              <span class="px-2 py-0.5 bg-rose-500/10 text-rose-500 border border-rose-500/30 rounded-full text-[10px] font-extrabold">15-Min System Alert</span>
+            </h3>
+            <p class="text-[11px] text-zinc-400">Pengingat otomatis 15 menit sebelum berita ekonomi besar rilis agar terhindar dari volatilitas ekstrem.</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="refreshEconomicCalendarUI()" class="px-3.5 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+            <iconify-icon icon="lucide:refresh-cw" id="news-spin-icon" class="text-xs"></iconify-icon>
+            <span>Update Berita</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- News Events Grid Container -->
+      <div id="news-calendar-events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+        <!-- Event items loaded dynamically via js/trading.js -->
       </div>
     </div>
 
@@ -406,8 +442,8 @@
             <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Status Posisi Trading</label>
             <select id="input-status" onchange="toggleStatusMode()"
               class="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 font-bold">
-              <option value="RUNNING">⏳ RUNNING (Posisi Sedang Berjalan)</option>
-              <option value="CLOSED">🏁 CLOSED (Posisi Sudah Close / Selesai)</option>
+              <option value="RUNNING">RUNNING (Posisi Sedang Berjalan)</option>
+              <option value="CLOSED">CLOSED (Posisi Sudah Close / Selesai)</option>
             </select>
           </div>
 

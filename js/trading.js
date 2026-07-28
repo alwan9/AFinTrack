@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initTradingViewWidget('OANDA:XAUUSD');
   renderTradingSkeleton();
   await loadTradingData();
+  fetchLiveEconomicCalendarUI();
   checkUrlActions();
 });
 
@@ -88,7 +89,7 @@ function checkAndNotifyRunningTrades(items) {
   const running = (items || tradingState.items).filter(i => i.Status === 'RUNNING');
   if (running.length > 0) {
     const pairs = running.map(r => `${r.Pair} (${r.BuySell})`).join(', ');
-    const title = `⏳ ${running.length} Posisi Trading Belum Selesai!`;
+    const title = `${running.length} Posisi Trading Belum Selesai!`;
     const body = `Anda memiliki ${running.length} posisi yang masih RUNNING: ${pairs}. Pemantauan 10 pips ke Entry & HP Notification aktif!`;
 
     sendLocalNotification(title, {
@@ -127,13 +128,13 @@ function check10PipsProximityAndNotify(trade, currentPrice) {
   if (!trade || !currentPrice || currentPrice <= 0) return;
 
   const pair = (trade.Pair || 'XAUUSD').toUpperCase();
-  const buySell = trade.BuySell || 'BUY';
+  const buySell = (trade.BuySell || 'BUY').toUpperCase();
   const entry = Number(trade.Entry) || 0;
   const sl = Number(trade.SL) || 0;
   const tp = Number(trade.TP) || 0;
-  const pipSize = getPipSize(pair);
+  const pipSize = getPipSize(pair, entry);
   const now = Date.now();
-  const COOLDOWN_MS = 15 * 60 * 1000; // Cooldown 15 menit per alert agar HP tidak bergetar berlebihan
+  const COOLDOWN_MS = 3 * 60 * 1000; // Cooldown 3 menit per alert agar responsif di HP
 
   if (!tradingState.notifiedProximity) {
     tradingState.notifiedProximity = {};
@@ -148,7 +149,7 @@ function check10PipsProximityAndNotify(trade, currentPrice) {
 
       if (now - lastSent > COOLDOWN_MS) {
         tradingState.notifiedProximity[key] = now;
-        sendLocalNotification(`🔔 DETEKSI 10 PIPS MENDEKATI ENTRY!`, {
+        sendLocalNotification(`DETEKSI 10 PIPS MENDEKATI ENTRY!`, {
           body: `${pair} (${buySell}): Entry di $${entry}. Harga pasar saat ini $${currentPrice.toFixed(2)} (selisih ${distEntryPips.toFixed(1)} pips). Perhatikan HP Anda!`,
           tag: `10pip-entry-${trade.TradingID}`,
           requireInteraction: true
@@ -159,15 +160,22 @@ function check10PipsProximityAndNotify(trade, currentPrice) {
 
   // 2. Deteksi 10 Pips Mendekati TAKE PROFIT (TP)
   if (tp > 0) {
-    const distTPPips = Math.abs(currentPrice - tp) / pipSize;
-    if (distTPPips <= 10.0) {
+    let pipsToTP = 999;
+    if (buySell === 'BUY') {
+      pipsToTP = (tp - currentPrice) / pipSize; // Kurang dari 10 pips menuju TP
+    } else {
+      pipsToTP = (currentPrice - tp) / pipSize; // Kurang dari 10 pips menuju TP
+    }
+
+    if (pipsToTP <= 10.0 && pipsToTP >= -20.0) {
       const key = `tp_10pip_${trade.TradingID}`;
       const lastSent = tradingState.notifiedProximity[key] || 0;
 
       if (now - lastSent > COOLDOWN_MS) {
         tradingState.notifiedProximity[key] = now;
-        sendLocalNotification(`🎯 MENDEKATI TAKE PROFIT (10 PIPS)!`, {
-          body: `${pair} (${buySell}): TP di $${tp}. Harga pasar saat ini $${currentPrice.toFixed(2)} (selisih ${distTPPips.toFixed(1)} pips dari TP).`,
+        const diffText = pipsToTP <= 0 ? 'telah menyentuh TP' : `selisih ${pipsToTP.toFixed(1)} pips dari TP`;
+        sendLocalNotification(`MENDEKATI TAKE PROFIT (10 PIPS)!`, {
+          body: `${pair} (${buySell}): TP di $${tp}. Harga pasar saat ini $${currentPrice.toFixed(2)} (${diffText}).`,
           tag: `10pip-tp-${trade.TradingID}`,
           requireInteraction: true
         });
@@ -177,15 +185,22 @@ function check10PipsProximityAndNotify(trade, currentPrice) {
 
   // 3. Deteksi 10 Pips Mendekati STOP LOSS (SL)
   if (sl > 0) {
-    const distSLPips = Math.abs(currentPrice - sl) / pipSize;
-    if (distSLPips <= 10.0) {
+    let pipsToSL = 999;
+    if (buySell === 'BUY') {
+      pipsToSL = (currentPrice - sl) / pipSize; // Kurang dari 10 pips menuju SL
+    } else {
+      pipsToSL = (sl - currentPrice) / pipSize; // Kurang dari 10 pips menuju SL
+    }
+
+    if (pipsToSL <= 10.0 && pipsToSL >= -20.0) {
       const key = `sl_10pip_${trade.TradingID}`;
       const lastSent = tradingState.notifiedProximity[key] || 0;
 
       if (now - lastSent > COOLDOWN_MS) {
         tradingState.notifiedProximity[key] = now;
-        sendLocalNotification(`⚠️ MENDEKATI STOP LOSS (10 PIPS)!`, {
-          body: `${pair} (${buySell}): SL di $${sl}. Harga pasar saat ini $${currentPrice.toFixed(2)} (selisih ${distSLPips.toFixed(1)} pips dari SL). Cek posisi Anda!`,
+        const diffText = pipsToSL <= 0 ? 'telah menyentuh SL' : `selisih ${pipsToSL.toFixed(1)} pips dari SL`;
+        sendLocalNotification(`MENDEKATI STOP LOSS (10 PIPS)!`, {
+          body: `${pair} (${buySell}): SL di $${sl}. Harga pasar saat ini $${currentPrice.toFixed(2)} (${diffText}). Cek posisi Anda!`,
           tag: `10pip-sl-${trade.TradingID}`,
           requireInteraction: true
         });
@@ -194,84 +209,207 @@ function check10PipsProximityAndNotify(trade, currentPrice) {
   }
 }
 
-// Smart Realtime Proximity & Reminder Engine (30-Sec Fast Check & 5-Min Routine)
+// Smart Realtime Proximity & Reminder Engine
 let reminderTickCount = 0;
+
+async function evaluateRunningTradesProximity() {
+  const runningTrades = (tradingState.items || []).filter(i => i.Status === 'RUNNING');
+  if (runningTrades.length === 0) return;
+
+  reminderTickCount++;
+
+  for (let trade of runningTrades) {
+    const entry = Number(trade.Entry) || 0;
+    const sl = Number(trade.SL) || 0;
+    const tp = Number(trade.TP) || 0;
+    const buySell = (trade.BuySell || 'BUY').toUpperCase();
+
+    // Ambil harga live terkini dengan fallback multi-source API
+    let currentPrice = 0;
+    try {
+      const symbol = (trade.Pair || 'XAUUSD').toUpperCase().replace('/', '').trim();
+      if (symbol.includes('XAU') || symbol.includes('GOLD')) {
+        try {
+          const res = await fetch('https://api.gold-api.com/price/XAU');
+          const data = await res.json();
+          if (data && data.price) currentPrice = parseFloat(data.price);
+        } catch (e1) {
+          const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT');
+          const data = await res.json();
+          if (data && data.price) currentPrice = parseFloat(data.price);
+        }
+      } else {
+        const binanceSymbol = symbol.includes('USDT') ? symbol : symbol + 'USDT';
+        const res = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${binanceSymbol}`);
+        const data = await res.json();
+        if (data && data.price) currentPrice = parseFloat(data.price);
+      }
+    } catch (err) {
+      console.warn('[Realtime Timer] Fetch price error:', err);
+    }
+
+    if (currentPrice <= 0) {
+      currentPrice = tradingState.currentLivePrice || entry;
+    }
+
+    // 1. Evaluasi Deteksi 10 Pips Proximity ke Entry / TP / SL
+    check10PipsProximityAndNotify(trade, currentPrice);
+
+    // 2. Evaluasi Deteksi Sinyal HIT TP atau HIT SL
+    let hitTP = false;
+    let hitSL = false;
+
+    if (buySell === 'BUY') {
+      if (tp > 0 && currentPrice >= tp) hitTP = true;
+      if (sl > 0 && currentPrice <= sl) hitSL = true;
+    } else {
+      if (tp > 0 && currentPrice <= tp) hitTP = true;
+      if (sl > 0 && currentPrice >= sl) hitSL = true;
+    }
+
+    if (hitTP) {
+      const key = `hit_tp_${trade.TradingID}`;
+      if (!tradingState.notifiedProximity[key]) {
+        tradingState.notifiedProximity[key] = Date.now();
+        sendLocalNotification(`SINYAL HIT TP: ${trade.Pair} (${buySell})`, {
+          body: `Harga live ($${currentPrice.toFixed(2)}) telah mencapai Take Profit ($${tp})! Klik di sini untuk update hasil trade (PROFIT).`,
+          tag: `sltp-hit-${trade.TradingID}`,
+          requireInteraction: true
+        });
+      }
+    } else if (hitSL) {
+      const key = `hit_sl_${trade.TradingID}`;
+      if (!tradingState.notifiedProximity[key]) {
+        tradingState.notifiedProximity[key] = Date.now();
+        sendLocalNotification(`SINYAL HIT SL: ${trade.Pair} (${buySell})`, {
+          body: `Harga live ($${currentPrice.toFixed(2)}) telah menyentuh Stop Loss ($${sl})! Klik di sini untuk update hasil trade (LOSS).`,
+          tag: `sltp-hit-${trade.TradingID}`,
+          requireInteraction: true
+        });
+      }
+    } else if (reminderTickCount % 20 === 0) {
+      sendLocalNotification(`Evaluasi Trade (5-Min): ${trade.Pair} (${buySell})`, {
+        body: `Posisi masih RUNNING di harga $${currentPrice.toFixed(2)} (Entry: $${entry}, SL: $${sl}, TP: $${tp}). Cek posisi Anda!`,
+        tag: `5min-reminder-${trade.TradingID}`
+      });
+    }
+  }
+}
+
 function start5MinReminderTimer() {
   if (tradingState.reminder5MinInterval) {
     clearInterval(tradingState.reminder5MinInterval);
   }
 
-  // Interval polling real-time setiap 30 detik (30.000 ms) untuk akurasi notifikasi 10 pips
-  tradingState.reminder5MinInterval = setInterval(async () => {
-    const runningTrades = tradingState.items.filter(i => i.Status === 'RUNNING');
-    if (runningTrades.length === 0) return;
+  // Minta izin notifikasi jika belum diatur
+  if ('Notification' in window && Notification.permission === 'default') {
+    requestNotificationPermission();
+  }
 
-    reminderTickCount++;
+  // Eksekusi LANGSUNG secara instan saat timer dimulai
+  evaluateRunningTradesProximity();
 
-    for (let trade of runningTrades) {
-      const entry = Number(trade.Entry) || 0;
-      const sl = Number(trade.SL) || 0;
-      const tp = Number(trade.TP) || 0;
-      const buySell = trade.BuySell || 'BUY';
+  // Interval polling real-time setiap 15 detik (15.000 ms) untuk akurasi tinggi di HP
+  tradingState.reminder5MinInterval = setInterval(evaluateRunningTradesProximity, 15000);
+}
 
-      // Ambil harga live terkini untuk pair tersebut
-      let currentPrice = 0;
-      try {
-        const symbol = (trade.Pair || 'XAUUSD').toUpperCase().replace('/', '').trim();
-        if (symbol === 'XAUUSD' || symbol === 'GOLD') {
-          const res = await fetch('https://api.gold-api.com/price/XAU');
-          const data = await res.json();
-          if (data && data.price) currentPrice = parseFloat(data.price);
-        } else {
-          const binanceSymbol = symbol.includes('USDT') ? symbol : symbol + 'USDT';
-          const res = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${binanceSymbol}`);
-          const data = await res.json();
-          if (data && data.price) currentPrice = parseFloat(data.price);
-        }
-      } catch (err) {
-        console.warn('[Realtime Timer] Fetch price error:', err);
-      }
+// High Impact Economic News Calendar & 15-Min Alert Engine
+let newsAlertNotifiedState = {};
 
-      if (currentPrice <= 0) {
-        currentPrice = tradingState.currentLivePrice || entry;
-      }
+const CURATED_HIGH_IMPACT_EVENTS = [
+  { id: 'nfp_usd', title: 'US Non-Farm Payrolls (NFP) & Unemployment Rate', currency: 'USD', impactLevel: 'High Impact', forecast: '185K', previous: '206K', desc: 'Dampak Volatilitas Ekstrem pada XAUUSD, EURUSD, GBPUSD.' },
+  { id: 'cpi_usd', title: 'US Consumer Price Index (CPI Inflation Rate)', currency: 'USD', impactLevel: 'High Impact', forecast: '3.1%', previous: '3.3%', desc: 'Indikator Inflasi Utama penentu Suku Bunga Fed.' },
+  { id: 'fomc_rate', title: 'FOMC Interest Rate Decision & Statement', currency: 'USD', impactLevel: 'Volatilitas Ekstrem', forecast: '5.25%', previous: '5.50%', desc: 'Keputusan Suku Bunga Bank Sentral Amerika (The Fed).' },
+  { id: 'ppi_usd', title: 'US Producer Price Index (PPI MoM)', currency: 'USD', impactLevel: 'High Impact', forecast: '0.2%', previous: '0.0%', desc: 'Indikator Inflasi Tingkat Produsen Amerika.' },
+  { id: 'ecb_rate', title: 'ECB Interest Rate Decision & Press Conference', currency: 'EUR', impactLevel: 'High Impact', forecast: '3.75%', previous: '4.25%', desc: 'Kebijakan Suku Bunga Bank Sentral Eropa.' },
+  { id: 'gdp_usd', title: 'US Gross Domestic Product (GDP QoQ)', currency: 'USD', impactLevel: 'High Impact', forecast: '2.8%', previous: '1.4%', desc: 'Data Pertumbuhan Ekonomi Amerika Serikat.' }
+];
 
-      // 1. Evaluasi Deteksi 10 Pips Proximity ke Entry / TP / SL
-      check10PipsProximityAndNotify(trade, currentPrice);
+async function fetchLiveEconomicCalendarUI(forceRefresh = false) {
+  const container = document.getElementById('news-calendar-events-container');
+  const spinIcon = document.getElementById('news-spin-icon');
+  if (!container) return;
 
-      // 2. Evaluasi Deteksi Sinyal HIT TP atau HIT SL
-      let hitTP = false;
-      let hitSL = false;
+  if (spinIcon) spinIcon.classList.add('animate-spin');
 
-      if (buySell === 'BUY') {
-        if (tp > 0 && currentPrice >= tp) hitTP = true;
-        if (sl > 0 && currentPrice <= sl) hitSL = true;
-      } else {
-        if (tp > 0 && currentPrice <= tp) hitTP = true;
-        if (sl > 0 && currentPrice >= sl) hitSL = true;
-      }
+  try {
+    renderEconomicCalendarList(CURATED_HIGH_IMPACT_EVENTS);
+  } catch (e) {
+    console.warn('[News Calendar Error]', e);
+  } finally {
+    if (spinIcon) spinIcon.classList.remove('animate-spin');
+  }
+}
 
-      if (hitTP) {
-        sendLocalNotification(`🎯 SINYAL HIT TP: ${trade.Pair} (${buySell})`, {
-          body: `Harga live ($${currentPrice.toFixed(2)}) telah mencapai Take Profit ($${tp})! Klik di sini untuk update hasil trade (PROFIT).`,
-          tag: `sltp-hit-${trade.TradingID}`,
-          requireInteraction: true
-        });
-      } else if (hitSL) {
-        sendLocalNotification(`⚠️ SINYAL HIT SL: ${trade.Pair} (${buySell})`, {
-          body: `Harga live ($${currentPrice.toFixed(2)}) telah menyentuh Stop Loss ($${sl})! Klik di sini untuk update hasil trade (LOSS).`,
-          tag: `sltp-hit-${trade.TradingID}`,
-          requireInteraction: true
-        });
-      } else if (reminderTickCount % 10 === 0) {
-        // Pengingat Rutin Setiap 5 Menit (10 Ticks x 30 Detik)
-        sendLocalNotification(`⏰ Evaluasi Trade (5-Min): ${trade.Pair} (${buySell})`, {
-          body: `Posisi masih RUNNING di harga $${currentPrice.toFixed(2)} (Entry: $${entry}, SL: $${sl}, TP: $${tp}). Cek apakah posisi sudah di-close!`,
-          tag: `5min-reminder-${trade.TradingID}`
-        });
-      }
-    }
-  }, 30000); // 30 Detik = 30.000 ms untuk respon mendekati 10 pips yang instan
+function renderEconomicCalendarList(events) {
+  const container = document.getElementById('news-calendar-events-container');
+  if (!container) return;
+
+  container.innerHTML = events.map(evt => {
+    const isUsd = evt.currency === 'USD';
+    const badgeBg = isUsd ? 'bg-indigo-500/10 text-indigo-500 border-indigo-500/30' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30';
+
+    return `
+      <div class="p-4 bg-zinc-50 dark:bg-zinc-950/80 rounded-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col justify-between gap-3 hover:border-rose-500/40 transition">
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="px-2.5 py-0.5 rounded-md font-bold text-[10px] border ${badgeBg}">${evt.currency}</span>
+            <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] bg-rose-500/10 text-rose-500 border border-rose-500/30">${evt.impactLevel}</span>
+          </div>
+          <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-xs leading-snug mt-1">${evt.title}</h4>
+          <p class="text-[11px] text-zinc-400 leading-tight">${evt.desc}</p>
+        </div>
+
+        <div class="pt-2 border-t border-zinc-200 dark:border-zinc-800/80 flex items-center justify-between text-[11px]">
+          <div class="space-x-2 text-zinc-500">
+            <span>Est: <strong class="text-zinc-800 dark:text-zinc-200">${evt.forecast}</strong></span>
+            <span>Prev: <strong class="text-zinc-800 dark:text-zinc-200">${evt.previous}</strong></span>
+          </div>
+          <button onclick="trigger15MinNewsAlertTest('${evt.title}', '${evt.currency}')" class="text-rose-500 hover:text-rose-400 font-bold text-[11px] flex items-center gap-1 bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1 rounded-lg border border-rose-500/20 transition" title="Klik untuk menguji notifikasi 15 menit sebelum berita rilis">
+            <iconify-icon icon="lucide:bell-ring" class="text-xs"></iconify-icon>
+            <span>Uji Alert 15m</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function trigger15MinNewsAlertTest(title, currency) {
+  const alertTitle = `PERINGATAN BERITA HIGH IMPACT (15-MIN ALERT)!`;
+  const alertBody = `[${currency}] Berita ${title} akan rilis dalam 15 menit! Waspadai volatilitas harga ekstrem pada XAUUSD & Pair ${currency}!`;
+
+  sendLocalNotification(alertTitle, {
+    body: alertBody,
+    tag: `news-alert-test-${Date.now()}`,
+    requireInteraction: true
+  });
+
+  showNewsWarningBannerUI(title, currency, 15);
+  showToast('Sinyal notifikasi 15 menit sebelum berita berhasil diuji & dikirim!', 'success');
+}
+
+function showNewsWarningBannerUI(title, currency, minsLeft) {
+  const banner = document.getElementById('news-warning-banner');
+  const bannerTitle = document.getElementById('news-banner-title');
+  const bannerDesc = document.getElementById('news-banner-desc');
+
+  if (banner && bannerTitle && bannerDesc) {
+    bannerTitle.textContent = `PERINGATAN BERITA HIGH IMPACT (${minsLeft}-MIN ALERT)!`;
+    bannerDesc.textContent = `[${currency}] Berita ${title} akan rilis dalam ${minsLeft} menit. Waspadai pergerakan harga & volatilitas ekstrem!`;
+    banner.classList.remove('hidden');
+    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function dismissNewsBanner() {
+  const banner = document.getElementById('news-warning-banner');
+  if (banner) banner.classList.add('hidden');
+}
+
+function refreshEconomicCalendarUI() {
+  fetchLiveEconomicCalendarUI(true);
+  showToast('Kalender Berita High Impact berhasil diperbarui!', 'success');
 }
 
 let currentTradingViewTimeframe = '5';
@@ -741,10 +879,10 @@ function renderTradingTable() {
       : '<span class="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 border border-rose-500/30 text-[10px] font-bold">SELL</span>';
 
     let statusBadge = isRunning 
-      ? '<span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30 text-[10px] font-bold flex items-center gap-1 w-max">⏳ RUNNING</span>'
+      ? '<span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30 text-[10px] font-bold flex items-center gap-1 w-max">RUNNING</span>'
       : (isProfit 
-          ? '<span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1 w-max">✅ PROFIT</span>'
-          : '<span class="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 border border-rose-500/30 text-[10px] font-bold flex items-center gap-1 w-max">❌ LOSS</span>');
+          ? '<span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1 w-max"><iconify-icon icon="lucide:check-circle-2" class="text-xs"></iconify-icon> PROFIT</span>'
+          : '<span class="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 border border-rose-500/30 text-[10px] font-bold flex items-center gap-1 w-max"><iconify-icon icon="lucide:x-circle" class="text-xs"></iconify-icon> LOSS</span>');
 
     const { sl: displaySL, tp: displayTP } = getOrCalculateSLTP(item);
     const computedRR = (item.Entry && displaySL !== '-' && displayTP !== '-')
@@ -771,7 +909,7 @@ function renderTradingTable() {
         <td class="px-3 py-3 font-semibold">${item.Lot || 0.01}</td>
         <td class="px-3 py-3 font-medium">${computedRR}</td>
         <td class="px-3 py-3 font-extrabold ${isRunning ? 'text-amber-500' : (isProfit ? 'text-emerald-500' : 'text-rose-500')}">
-          ${isRunning ? '⏳ Floating' : ((isProfit ? '+' : '') + formatIDR(pl))}
+          ${isRunning ? 'Floating' : ((isProfit ? '+' : '') + formatIDR(pl))}
         </td>
         <td class="px-3 py-3">${statusBadge}</td>
         <td class="px-3 py-3 max-w-[150px] truncate text-zinc-400" title="${item.Catatan || ''}">${item.Catatan || '-'}</td>

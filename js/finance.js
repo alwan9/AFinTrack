@@ -330,7 +330,7 @@ async function deleteFinance(financeID) {
   }
 }
 
-// 🎙️ Voice Assistant Integration Engine (Siri & Google Assistant Web Speech Recognition API)
+// Voice Assistant Integration Engine (Siri & Google Assistant Web Speech Recognition API)
 function parseIndonesianFinanceSpeech(transcript) {
   if (!transcript || typeof transcript !== 'string') return null;
 
@@ -437,7 +437,7 @@ function startVoiceInputFinance() {
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
 
-  showToast('🎙️ Mendengarkan suara... Ucapkan perintah (cth: "Pengeluaran 50 ribu makan siang")', 'info');
+  showToast('Mendengarkan suara... Ucapkan perintah (cth: "Pengeluaran 50 ribu makan siang")', 'info');
 
   const btnVoice = document.getElementById('btn-voice-finance');
   if (btnVoice) btnVoice.classList.add('animate-pulse', 'ring-4', 'ring-amber-400');
@@ -446,7 +446,7 @@ function startVoiceInputFinance() {
 
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
-    showToast(`🎙️ Suara terdeteksi: "${transcript}"`, 'success');
+    showToast(`Suara terdeteksi: "${transcript}"`, 'success');
 
     const parsed = parseIndonesianFinanceSpeech(transcript);
     if (parsed) {
@@ -460,7 +460,7 @@ function startVoiceInputFinance() {
       }
       document.getElementById('input-keterangan').value = parsed.keterangan;
 
-      showToast(`✅ Transaksi ${parsed.tipe} Rp ${new Intl.NumberFormat('id-ID').format(parsed.nominal)} berhasil diisi otomatis!`, 'success');
+      showToast(`Transaksi ${parsed.tipe} Rp ${new Intl.NumberFormat('id-ID').format(parsed.nominal)} berhasil diisi otomatis!`, 'success');
     }
   };
 

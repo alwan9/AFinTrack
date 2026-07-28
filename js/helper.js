@@ -61,15 +61,25 @@ function togglePasswordVisibility(inputId, eyeIconId) {
   }
 }
 
-// Privacy Mode Manager (Sembunyikan Saldo: Rp •••••••)
+// Privacy Mode Manager (Sembunyikan Saldo per UserID)
+function getPrivacyKey() {
+  const session = typeof getSession === 'function' ? getSession() : null;
+  const uid = (session && session.userID) ? session.userID : 'GUEST';
+  return `AFINTRACK_PRIVACY_MODE_${uid}`;
+}
+
 function isPrivacyMode() {
-  return localStorage.getItem('AFINTRACK_PRIVACY_MODE') === 'true' || localStorage.getItem('MONEYM_PRIVACY_MODE') === 'true';
+  const key = getPrivacyKey();
+  const val = localStorage.getItem(key);
+  if (val !== null) return val === 'true';
+  return localStorage.getItem('AFINTRACK_PRIVACY_MODE') === 'true';
 }
 
 function togglePrivacyMode() {
   const current = isPrivacyMode();
   const nextState = !current;
-  localStorage.setItem('AFINTRACK_PRIVACY_MODE', nextState ? 'true' : 'false');
+  const key = getPrivacyKey();
+  localStorage.setItem(key, nextState ? 'true' : 'false');
 
   updatePrivacyIcon(nextState);
   showToast(nextState ? 'Privacy Mode AKTIF (Saldo disembunyikan)' : 'Privacy Mode NONAKTIF', 'info');
@@ -256,14 +266,14 @@ async function requestNotificationPermission() {
     return false;
   }
   if (Notification.permission === 'granted') {
-    showToast('Notifikasi HP sudah diizinkan & aktif! 🔔', 'success');
+    showToast('Notifikasi HP sudah diizinkan & aktif!', 'success');
     return true;
   }
   if (Notification.permission !== 'denied') {
     const perm = await Notification.requestPermission();
     if (perm === 'granted') {
-      showToast('Notifikasi HP berhasil diaktifkan! 🔔', 'success');
-      sendLocalNotification('🔔 Notifikasi HP Aktif!', {
+      showToast('Notifikasi HP berhasil diaktifkan!', 'success');
+      sendLocalNotification('Notifikasi HP Aktif!', {
         body: 'Selamat! Notifikasi 10 pips mendekati Entry & TP/SL akan terkirim langsung ke HP Anda.',
         tag: 'afintrack-permission-confirmed'
       });
@@ -277,7 +287,7 @@ async function requestNotificationPermission() {
 async function testMobileNotification() {
   const granted = await requestNotificationPermission();
   if (granted || Notification.permission === 'granted') {
-    sendLocalNotification('🧪 Tes Notifikasi HP (AFinTrack)', {
+    sendLocalNotification('Tes Notifikasi HP (AFinTrack)', {
       body: 'Notifikasi HP Anda berfungsi sempurna! Peringatan 10 pips mendekati Entry akan muncul langsung di HP Anda.',
       tag: 'afintrack-mobile-test-' + Date.now(),
       vibrate: [300, 100, 300, 100, 300],
@@ -319,7 +329,7 @@ function sendLocalNotification(title, options = {}) {
   }
 }
 
-// 📶 Offline Queue Manager Engine
+// Offline Queue Manager Engine
 const OFFLINE_QUEUE_KEY = 'AFINTRACK_OFFLINE_QUEUE';
 
 function getOfflineQueue() {
@@ -339,14 +349,14 @@ function saveOfflineQueue(action, payload) {
     timestamp: Date.now()
   });
   localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
-  showToast('⚠️ Anda sedang offline. Data disimpan di HP & akan otomatis tersinkron saat internet tersambung!', 'warning');
+  showToast('Anda sedang offline. Data disimpan di HP & akan otomatis tersinkron saat internet tersambung!', 'warning');
 }
 
 async function syncOfflineQueue() {
   const queue = getOfflineQueue();
   if (queue.length === 0) return;
 
-  showToast(`🔄 Terhubung kembali. Menyingkronkan ${queue.length} transaksi offline ke server...`, 'info');
+  showToast(`Terhubung kembali. Menyingkronkan ${queue.length} transaksi offline ke server...`, 'info');
 
   let successCount = 0;
   const remaining = [];
@@ -367,7 +377,7 @@ async function syncOfflineQueue() {
   localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(remaining));
 
   if (successCount > 0) {
-    showToast(`✅ Berhasil menyingkronkan ${successCount} data offline!`, 'success');
+    showToast(`Berhasil menyingkronkan ${successCount} data offline!`, 'success');
     if (typeof loadDashboardData === 'function') loadDashboardData();
     if (typeof loadTradingData === 'function') loadTradingData();
     if (typeof loadFinanceData === 'function') loadFinanceData();
@@ -379,7 +389,7 @@ function initOfflineSyncEngine() {
     syncOfflineQueue();
   });
   window.addEventListener('offline', () => {
-    showToast('📶 Sinyal terputus. Mode pencatatan offline aktif.', 'warning');
+    showToast('Sinyal terputus. Mode pencatatan offline aktif.', 'warning');
   });
 
   // Percobaan sync otomatis saat pertama kali dibuka jika online
@@ -388,7 +398,7 @@ function initOfflineSyncEngine() {
   }
 }
 
-// 📲 Custom PWA Install Prompt Engine
+// Custom PWA Install Prompt Engine
 window.deferredPwaPrompt = null;
 
 function initPwaInstallBanner() {
@@ -406,7 +416,7 @@ function initPwaInstallBanner() {
     window.deferredPwaPrompt = null;
     localStorage.setItem('AFINTRACK_PWA_INSTALLED', 'true');
     hidePwaInstallBannerUI();
-    showToast('🎉 Aplikasi AFinTrack berhasil diinstall di HP Anda!', 'success');
+    showToast('Aplikasi AFinTrack berhasil diinstall di HP Anda!', 'success');
   });
 }
 
@@ -502,8 +512,12 @@ async function triggerPwaInstall() {
   }
 }
 
-// ⚙️ Application Settings Manager
-const APP_SETTINGS_KEY = 'AFINTRACK_APP_SETTINGS';
+// Application Settings Manager (Per-User Isolated Storage & Backend Sync)
+function getAppSettingsKey() {
+  const session = typeof getSession === 'function' ? getSession() : null;
+  const uid = (session && session.userID) ? session.userID : 'GUEST';
+  return `AFINTRACK_APP_SETTINGS_${uid}`;
+}
 
 function getAppSettings() {
   try {
@@ -514,7 +528,8 @@ function getAppSettings() {
       defaultLot: 0.01,
       defaultPair: 'XAUUSD'
     };
-    const saved = JSON.parse(localStorage.getItem(APP_SETTINGS_KEY));
+    const key = getAppSettingsKey();
+    const saved = JSON.parse(localStorage.getItem(key)) || JSON.parse(localStorage.getItem('AFINTRACK_APP_SETTINGS'));
     return saved ? { ...defaultSettings, ...saved } : defaultSettings;
   } catch (e) {
     return {
@@ -529,10 +544,37 @@ function getAppSettings() {
 
 function saveAppSettings(settings) {
   try {
-    localStorage.setItem(APP_SETTINGS_KEY, JSON.stringify(settings));
+    const key = getAppSettingsKey();
+    localStorage.setItem(key, JSON.stringify(settings));
+    localStorage.setItem('AFINTRACK_APP_SETTINGS', JSON.stringify(settings));
+
+    // Sinkronisasi otomatis ke Google Sheets backend per User ID
+    const session = typeof getSession === 'function' ? getSession() : null;
+    if (session && session.userID && typeof apiCall === 'function') {
+      apiCall('saveUserSettings', settings).catch(err => console.warn('[Settings Backend Sync]', err));
+    }
   } catch (e) {
     console.warn('[AppSettings] Failed to save settings:', e);
   }
+}
+
+async function syncAppSettingsFromBackend() {
+  const session = typeof getSession === 'function' ? getSession() : null;
+  if (session && session.userID && typeof apiCall === 'function') {
+    try {
+      const res = await apiCall('getUserSettings');
+      if (res && res.success && res.data) {
+        const key = getAppSettingsKey();
+        const current = getAppSettings();
+        const merged = { ...current, ...res.data };
+        localStorage.setItem(key, JSON.stringify(merged));
+        return merged;
+      }
+    } catch (e) {
+      console.warn('[Settings Sync Error]', e);
+    }
+  }
+  return getAppSettings();
 }
 
 /**
@@ -688,7 +730,7 @@ function formatTerbilangRupiah(num) {
     wordLabel = `${absNum} Rupiah`;
   }
 
-  return `➔ ${formattedNum} (${wordLabel})`;
+  return `-> ${formattedNum} (${wordLabel})`;
 }
 
 /**
