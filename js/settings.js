@@ -57,7 +57,7 @@ async function initSettingsUI() {
   if (rrSelect) rrSelect.value = settings.defaultRR || '1:2';
 
   const slPipsInput = document.getElementById('setting-default-slpips');
-  if (slPipsInput) slPipsInput.value = settings.defaultSLPips || 50;
+  if (slPipsInput) slPipsInput.value = settings.defaultSLPips || 100;
 
   const lotInput = document.getElementById('setting-default-lot');
   if (lotInput) lotInput.value = settings.defaultLot || 0.01;
@@ -120,7 +120,7 @@ function saveAllSettingsFromUI() {
     ...currentSettings,
     currency: document.getElementById('setting-currency-format')?.value || 'IDR',
     defaultRR: document.getElementById('setting-default-rr')?.value || '1:2',
-    defaultSLPips: Number(document.getElementById('setting-default-slpips')?.value) || 50,
+    defaultSLPips: Number(document.getElementById('setting-default-slpips')?.value) || 100,
     defaultLot: Number(document.getElementById('setting-default-lot')?.value) || 0.01,
     defaultPair: (document.getElementById('setting-default-pair')?.value || 'XAUUSD').toUpperCase().trim()
   };

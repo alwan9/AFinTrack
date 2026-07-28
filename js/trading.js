@@ -102,22 +102,13 @@ function checkAndNotifyRunningTrades(items) {
 // Helper Penentu Ukuran Pip per Instrumen & Skala Harga Entry
 function getPipSize(pair = 'XAUUSD', entryVal = 0) {
   const p = (pair || 'XAUUSD').toUpperCase().replace('/', '').trim();
-  const entry = Number(entryVal) || 0;
 
   if (p.includes('XAU') || p.includes('GOLD')) {
-    return 0.10; // Gold/XAUUSD: $0.10 = 1 pip
+    return 0.10; // Gold/XAUUSD: $0.10 = 1 pip (100 pips = $10.0, 200 pips = $20.0)
   } else if (p.includes('JPY')) {
     return 0.01;  // JPY Pairs: 0.01 = 1 pip
   } else if (p.includes('BTC') || p.includes('ETH')) {
     return 1.0;   // Crypto: $1.00 = 1 pip
-  }
-
-  // Jika skala harga entry besar (misal 5000): 
-  // entry >= 1000 -> 2.0 (50 pips = 100 poin Risk, 100 pips = 200 poin Reward untuk R:R 1:2)
-  if (entry >= 1000) {
-    return 2.0;
-  } else if (entry >= 100) {
-    return 0.10;
   }
 
   return 0.0001; // Standard Forex: 0.0001 = 1 pip
@@ -273,7 +264,7 @@ async function evaluateRunningTradesProximity() {
         tradingState.notifiedProximity[key] = Date.now();
 
         const title = `🎯 SINYAL HIT TAKE PROFIT (TP): ${trade.Pair} (${buySell})`;
-        const body = `Harga live ($${currentPrice.toFixed(2)}) MENCAPAI Take Profit ($${tp})! Entry: $${entry}. Status: PROFIT!`;
+        const body = `Harga live ($${currentPrice.toFixed(2)}) MENCAPAI Take Profit ($${tp})! Posisi OTOMATIS DITUTUP (PROFIT)!`;
 
         // 1. Notifikasi Sistem HP / PC
         sendLocalNotification(title, {
@@ -288,6 +279,9 @@ async function evaluateRunningTradesProximity() {
         // 3. Tampilkan Banner & Toast
         showSLTPHitBannerUI(trade, currentPrice, 'TP');
         showToast(title, 'success');
+
+        // 4. Auto-Close Posisi di Server Database & Reload Tabel secara Instan!
+        autoCloseTradingPosition(trade, currentPrice, 'TP');
       }
     } else if (hitSL) {
       const key = `hit_sl_${trade.TradingID}`;
@@ -295,7 +289,7 @@ async function evaluateRunningTradesProximity() {
         tradingState.notifiedProximity[key] = Date.now();
 
         const title = `🛑 SINYAL HIT STOP LOSS (SL): ${trade.Pair} (${buySell})`;
-        const body = `Harga live ($${currentPrice.toFixed(2)}) MENYENTUH Stop Loss ($${sl})! Entry: $${entry}. Status: LOSS!`;
+        const body = `Harga live ($${currentPrice.toFixed(2)}) MENYENTUH Stop Loss ($${sl})! Posisi OTOMATIS DITUTUP (LOSS)!`;
 
         // 1. Notifikasi Sistem HP / PC
         sendLocalNotification(title, {
@@ -310,6 +304,9 @@ async function evaluateRunningTradesProximity() {
         // 3. Tampilkan Banner & Toast
         showSLTPHitBannerUI(trade, currentPrice, 'SL');
         showToast(title, 'warning');
+
+        // 4. Auto-Close Posisi di Server Database & Reload Tabel secara Instan!
+        autoCloseTradingPosition(trade, currentPrice, 'SL');
       }
     } else if (reminderTickCount % 20 === 0) {
       sendLocalNotification(`Evaluasi Trade (5-Min): ${trade.Pair} (${buySell})`, {
@@ -380,6 +377,90 @@ function resolveSLTPHitTrade() {
   if (activeSLTPHitTrade && activeSLTPHitTrade.TradingID) {
     openTradingModal(activeSLTPHitTrade.TradingID);
     dismissSLTPHitBanner();
+  }
+}
+
+// Kalkulator Profit / Loss Trading Akurat berdasarkan Instrument & Lot
+function calculateTradingPnL(trade, exitPriceVal = 0) {
+  const pair = (trade.Pair || 'XAUUSD').toUpperCase().replace('/', '').trim();
+  const buySell = (trade.BuySell || 'BUY').toUpperCase();
+  const entry = Number(trade.Entry) || 0;
+  const exitPrice = Number(exitPriceVal) || Number(trade.Exit) || entry;
+  const lot = Number(trade.Lot) || 0.01;
+  const pipSize = getPipSize(pair, entry);
+
+  if (entry <= 0 || exitPrice <= 0) return 0;
+
+  const priceDiff = buySell === 'BUY' ? (exitPrice - entry) : (entry - exitPrice);
+  const pips = priceDiff / pipSize;
+
+  let pnlUSD = 0;
+  if (pair.includes('XAU') || pair.includes('GOLD')) {
+    // Emas/XAUUSD: $1.00 pergerakan harga pada 1.00 Lot = $100 USD
+    pnlUSD = priceDiff * lot * 100;
+  } else if (pair.includes('BTC') || pair.includes('ETH')) {
+    pnlUSD = priceDiff * lot * 1.0;
+  } else {
+    // Standard Forex & JPY Pairs: 1 pip (0.0001 / 0.01) pada 0.01 lot = $0.10 USD
+    pnlUSD = pips * lot * 0.10;
+  }
+
+  const settings = typeof getAppSettings === 'function' ? getAppSettings() : {};
+  const rate = typeof getLiveUsdIdrRate === 'function' ? getLiveUsdIdrRate() : 16250;
+
+  let finalPL = pnlUSD;
+  if (settings.currency !== 'USD') {
+    finalPL = pnlUSD * rate;
+  }
+
+  return Math.round(finalPL);
+}
+
+// Auto-Close Trade Position saat Menyentuh SL / TP
+async function autoCloseTradingPosition(trade, currentPrice, hitType) {
+  const exitPrice = (hitType === 'TP' && Number(trade.TP) > 0)
+    ? Number(trade.TP)
+    : ((hitType === 'SL' && Number(trade.SL) > 0) ? Number(trade.SL) : currentPrice);
+
+  const calculatedPL = calculateTradingPnL(trade, exitPrice);
+  const buySell = (trade.BuySell || 'BUY').toUpperCase();
+  const calculatedRR = (trade.Entry > 0 && trade.SL > 0 && trade.TP > 0)
+    ? calculateActualRR(trade.Entry, trade.SL, trade.TP, trade.RR || '1:2')
+    : (trade.RR || '1:2');
+
+  const oldNote = trade.Catatan || '';
+  const autoNote = `[Auto-Closed via ${hitType} Hit $${exitPrice.toFixed(2)}]`;
+  const finalCatatan = oldNote.includes('[Auto-Closed') ? oldNote : (oldNote ? `${oldNote} ${autoNote}` : autoNote);
+
+  const payload = {
+    TradingID: trade.TradingID,
+    Tanggal: trade.Tanggal || new Date().toISOString().split('T')[0],
+    Pair: (trade.Pair || 'XAUUSD').toUpperCase(),
+    BuySell: buySell,
+    Status: 'CLOSED',
+    Entry: Number(trade.Entry) || 0,
+    SL: Number(trade.SL) || 0,
+    TP: Number(trade.TP) || 0,
+    Exit: exitPrice,
+    Lot: Number(trade.Lot) || 0.01,
+    ProfitLoss: calculatedPL,
+    RR: calculatedRR,
+    Catatan: finalCatatan
+  };
+
+  try {
+    const res = await apiCall('updateTrading', payload);
+    if (res && res.success) {
+      const plText = typeof formatPrivacyIDR === 'function' ? formatPrivacyIDR(calculatedPL) : `${calculatedPL}`;
+      showToast(`⚡ POSISI AUTO-CLOSED: ${trade.Pair} (${buySell}) tersentuh ${hitType}! (${calculatedPL >= 0 ? '+' : ''}${plText})`, calculatedPL >= 0 ? 'success' : 'warning');
+      
+      // Update item lokal & reload data secara otomatis
+      if (typeof loadTradingData === 'function') {
+        await loadTradingData();
+      }
+    }
+  } catch (err) {
+    console.warn('[Auto-Close Error]', err);
   }
 }
 
@@ -636,7 +717,7 @@ function autoCalculateSLTP(force = false) {
   let pipSize = getPipSize(pair, entryVal);
 
   const appSettings = typeof getAppSettings === 'function' ? getAppSettings() : {};
-  const slPips = Number(appSettings.defaultSLPips) || 50;
+  const slPips = Number(appSettings.defaultSLPips) || 100;
   const tpPips = slPips * rrRatio;
 
   const tpDistance = tpPips * pipSize;
@@ -811,8 +892,8 @@ function getOrCalculateSLTP(item) {
 
     let pipSize = getPipSize(pair, entryVal);
 
-    const slPips = 50;
-    const tpPips = 50 * rrRatio;
+    const slPips = 100;
+    const tpPips = 100 * rrRatio;
     const tpDistance = tpPips * pipSize;
     const slDistance = slPips * pipSize;
 

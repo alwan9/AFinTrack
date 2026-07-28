@@ -567,7 +567,7 @@ function getAppSettings() {
     const defaultSettings = {
       currency: 'IDR',
       defaultRR: '1:2',
-      defaultSLPips: 50,
+      defaultSLPips: 100,
       defaultLot: 0.01,
       defaultPair: 'XAUUSD'
     };
@@ -578,7 +578,7 @@ function getAppSettings() {
     return {
       currency: 'IDR',
       defaultRR: '1:2',
-      defaultSLPips: 50,
+      defaultSLPips: 100,
       defaultLot: 0.01,
       defaultPair: 'XAUUSD'
     };
