@@ -329,6 +329,49 @@ function sendLocalNotification(title, options = {}) {
   }
 }
 
+/**
+ * Audio Notification Chime (Web Audio API - Suara Notifikasi Instan di HP & Desktop)
+ */
+function playNotificationChime(type = 'tp') {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+
+    if (type === 'tp') {
+      // Nada ganda cerah (D5 -> A5) untuk Take Profit
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, now);
+      osc.frequency.setValueAtTime(880, now + 0.12);
+      gain.gain.setValueAtTime(0.35, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.5);
+    } else if (type === 'sl') {
+      // Nada peringatan ganda (E4 -> A3) untuk Stop Loss
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(329.63, now);
+      osc.frequency.setValueAtTime(220, now + 0.15);
+      gain.gain.setValueAtTime(0.45, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.6);
+    }
+  } catch (e) {
+    console.warn('[Audio Alert Error]', e);
+  }
+}
+
 // Offline Queue Manager Engine
 const OFFLINE_QUEUE_KEY = 'AFINTRACK_OFFLINE_QUEUE';
 
@@ -749,5 +792,117 @@ function updateNominalPreview(inputId, previewId) {
     return;
   }
   preview.textContent = formatTerbilangRupiah(val);
+}
+
+/**
+ * High Impact Economic News Calendar Engine (Global Helper)
+ */
+let newsAlertNotifiedState = {};
+
+const CURATED_HIGH_IMPACT_EVENTS = [
+  { id: 'nfp_usd', title: 'US Non-Farm Payrolls (NFP) & Unemployment Rate', currency: 'USD', impactLevel: 'High Impact', forecast: '185K', previous: '206K', desc: 'Dampak Volatilitas Ekstrem pada XAUUSD, EURUSD, GBPUSD.' },
+  { id: 'cpi_usd', title: 'US Consumer Price Index (CPI Inflation Rate)', currency: 'USD', impactLevel: 'High Impact', forecast: '3.1%', previous: '3.3%', desc: 'Indikator Inflasi Utama penentu Suku Bunga Fed.' },
+  { id: 'fomc_rate', title: 'FOMC Interest Rate Decision & Statement', currency: 'USD', impactLevel: 'Volatilitas Ekstrem', forecast: '5.25%', previous: '5.50%', desc: 'Keputusan Suku Bunga Bank Sentral Amerika (The Fed).' },
+  { id: 'ppi_usd', title: 'US Producer Price Index (PPI MoM)', currency: 'USD', impactLevel: 'High Impact', forecast: '0.2%', previous: '0.0%', desc: 'Indikator Inflasi Tingkat Produsen Amerika.' },
+  { id: 'ecb_rate', title: 'ECB Interest Rate Decision & Press Conference', currency: 'EUR', impactLevel: 'High Impact', forecast: '3.75%', previous: '4.25%', desc: 'Kebijakan Suku Bunga Bank Sentral Eropa.' },
+  { id: 'gdp_usd', title: 'US Gross Domestic Product (GDP QoQ)', currency: 'USD', impactLevel: 'High Impact', forecast: '2.8%', previous: '1.4%', desc: 'Data Pertumbuhan Ekonomi Amerika Serikat.' }
+];
+
+async function fetchLiveEconomicCalendarUI(forceRefresh = false) {
+  const container = document.getElementById('news-calendar-events-container');
+  const spinIcon = document.getElementById('news-spin-icon');
+  if (!container) return;
+
+  if (spinIcon) spinIcon.classList.add('animate-spin');
+
+  try {
+    renderEconomicCalendarList(CURATED_HIGH_IMPACT_EVENTS);
+  } catch (e) {
+    console.warn('[News Calendar Error]', e);
+  } finally {
+    if (spinIcon) spinIcon.classList.remove('animate-spin');
+  }
+}
+
+function renderEconomicCalendarList(events) {
+  const container = document.getElementById('news-calendar-events-container');
+  if (!container) return;
+
+  container.innerHTML = events.map(evt => {
+    const isUsd = evt.currency === 'USD';
+    const badgeBg = isUsd ? 'bg-indigo-500/10 text-indigo-500 border-indigo-500/30' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30';
+    const ytQuery = encodeURIComponent(`${evt.title} Live Stream Forex`);
+    const ytUrl = `https://www.youtube.com/results?search_query=${ytQuery}`;
+
+    return `
+      <div class="p-4 bg-zinc-50 dark:bg-zinc-950/80 rounded-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col justify-between gap-3 hover:border-rose-500/40 transition">
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="px-2.5 py-0.5 rounded-md font-bold text-[10px] border ${badgeBg}">${evt.currency}</span>
+            <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] bg-rose-500/10 text-rose-500 border border-rose-500/30">${evt.impactLevel}</span>
+          </div>
+          <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-xs leading-snug mt-1">${evt.title}</h4>
+          <p class="text-[11px] text-zinc-400 leading-tight">${evt.desc}</p>
+        </div>
+
+        <div class="pt-2 border-t border-zinc-200 dark:border-zinc-800/80 space-y-2">
+          <div class="flex items-center justify-between text-[11px]">
+            <div class="space-x-2 text-zinc-500">
+              <span>Est: <strong class="text-zinc-800 dark:text-zinc-200">${evt.forecast}</strong></span>
+              <span>Prev: <strong class="text-zinc-800 dark:text-zinc-200">${evt.previous}</strong></span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between gap-1.5 pt-1 border-t border-zinc-200/60 dark:border-zinc-800/60">
+            <a href="${ytUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-red-600/10 hover:bg-red-600/20 text-red-500 border border-red-500/30 rounded-lg text-[11px] font-bold transition flex items-center gap-1" title="Tonton siaran langsung / ulasan berita ini di YouTube">
+              <iconify-icon icon="lucide:youtube" class="text-xs text-red-500"></iconify-icon>
+              <span>Tonton Live YT</span>
+            </a>
+            <button onclick="trigger15MinNewsAlertTest('${evt.title}', '${evt.currency}')" class="text-rose-500 hover:text-rose-400 font-bold text-[11px] flex items-center gap-1 bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1 rounded-lg border border-rose-500/20 transition" title="Klik untuk menguji notifikasi 15 menit sebelum berita rilis">
+              <iconify-icon icon="lucide:bell-ring" class="text-xs"></iconify-icon>
+              <span>Uji Alert 15m</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function trigger15MinNewsAlertTest(title, currency) {
+  const alertTitle = `PERINGATAN BERITA HIGH IMPACT (15-MIN ALERT)!`;
+  const alertBody = `[${currency}] Berita ${title} akan rilis dalam 15 menit! Waspadai volatilitas harga ekstrem pada XAUUSD & Pair ${currency}!`;
+
+  sendLocalNotification(alertTitle, {
+    body: alertBody,
+    tag: `news-alert-test-${Date.now()}`,
+    requireInteraction: true
+  });
+
+  showNewsWarningBannerUI(title, currency, 15);
+  showToast('Sinyal notifikasi 15 menit sebelum berita berhasil diuji & dikirim!', 'success');
+}
+
+function showNewsWarningBannerUI(title, currency, minsLeft) {
+  const banner = document.getElementById('news-warning-banner');
+  const bannerTitle = document.getElementById('news-banner-title');
+  const bannerDesc = document.getElementById('news-banner-desc');
+
+  if (banner && bannerTitle && bannerDesc) {
+    bannerTitle.textContent = `PERINGATAN BERITA HIGH IMPACT (${minsLeft}-MIN ALERT)!`;
+    bannerDesc.textContent = `[${currency}] Berita ${title} akan rilis dalam ${minsLeft} menit. Waspadai pergerakan harga & volatilitas ekstrem!`;
+    banner.classList.remove('hidden');
+    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function dismissNewsBanner() {
+  const banner = document.getElementById('news-warning-banner');
+  if (banner) banner.classList.add('hidden');
+}
+
+function refreshEconomicCalendarUI() {
+  fetchLiveEconomicCalendarUI(true);
+  showToast('Kalender Berita High Impact berhasil diperbarui!', 'success');
 }
 

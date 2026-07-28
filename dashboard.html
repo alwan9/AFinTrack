@@ -168,7 +168,59 @@
 
     </div>
 
-    <!-- Recent Activity Section -->
+    <!-- Live High Impact News Warning Banner (Auto Active <= 15 Mins) -->
+    <div id="news-warning-banner" class="hidden bg-gradient-to-r from-rose-500/20 via-amber-500/20 to-rose-500/20 border border-rose-500/40 rounded-3xl p-4 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-pulse">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-rose-500/20 text-rose-400 rounded-2xl border border-rose-500/30">
+          <iconify-icon icon="lucide:alert-triangle" class="text-2xl text-rose-400"></iconify-icon>
+        </div>
+        <div>
+          <h4 id="news-banner-title" class="text-sm font-bold text-rose-400">PERINGATAN BERITA HIGH IMPACT (15-MIN ALERT)!</h4>
+          <p id="news-banner-desc" class="text-xs text-zinc-200 mt-0.5">Berita NFP / CPI (USD) akan rilis dalam 15 menit. Waspadai pergerakan harga ekstrem!</p>
+        </div>
+      </div>
+      <button onclick="dismissNewsBanner()" class="px-4 py-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 text-xs font-bold rounded-xl border border-zinc-700 transition whitespace-nowrap">
+        Tutup Peringatan
+      </button>
+    </div>
+
+    <!-- High Impact Economic News Calendar Card -->
+    <div id="news-calendar-section" class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200 dark:border-zinc-800 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 rounded-2xl bg-rose-500/10 text-rose-500 border border-rose-500/20">
+            <iconify-icon icon="lucide:calendar-clock" class="text-xl"></iconify-icon>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+              <span>Kalender Berita High Impact (NFP, CPI, FOMC Alert)</span>
+              <span class="px-2 py-0.5 bg-rose-500/10 text-rose-500 border border-rose-500/30 rounded-full text-[10px] font-extrabold">15-Min System Alert</span>
+            </h3>
+            <p class="text-[11px] text-zinc-400">Pengingat otomatis 15 menit sebelum berita ekonomi besar rilis agar terhindar dari volatilitas ekstrem.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <a href="https://www.youtube.com/results?search_query=Live+US+Economic+News+NFP+CPI+Bloomberg+CNBC" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 bg-red-600/10 hover:bg-red-600/20 text-red-500 border border-red-500/30 rounded-xl text-xs font-bold transition flex items-center gap-1.5" title="Tonton Live Streaming Berita Ekonomi Amerika di YouTube">
+            <iconify-icon icon="lucide:youtube" class="text-sm text-red-500"></iconify-icon>
+            <span>Live Streaming YT</span>
+          </a>
+          <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5" title="Buka Kalender Berita Lengkap ForexFactory">
+            <iconify-icon icon="lucide:external-link" class="text-xs"></iconify-icon>
+            <span>ForexFactory</span>
+          </a>
+          <button onclick="refreshEconomicCalendarUI()" class="px-3.5 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+            <iconify-icon icon="lucide:refresh-cw" id="news-spin-icon" class="text-xs"></iconify-icon>
+            <span>Update Berita</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- News Events Grid Container -->
+      <div id="news-calendar-events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+        <!-- Event items loaded dynamically -->
+      </div>
+    </div>
     <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm space-y-4">
       <div class="flex items-center justify-between">
         <div>

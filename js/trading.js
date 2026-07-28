@@ -271,21 +271,45 @@ async function evaluateRunningTradesProximity() {
       const key = `hit_tp_${trade.TradingID}`;
       if (!tradingState.notifiedProximity[key]) {
         tradingState.notifiedProximity[key] = Date.now();
-        sendLocalNotification(`SINYAL HIT TP: ${trade.Pair} (${buySell})`, {
-          body: `Harga live ($${currentPrice.toFixed(2)}) telah mencapai Take Profit ($${tp})! Klik di sini untuk update hasil trade (PROFIT).`,
+
+        const title = `🎯 SINYAL HIT TAKE PROFIT (TP): ${trade.Pair} (${buySell})`;
+        const body = `Harga live ($${currentPrice.toFixed(2)}) MENCAPAI Take Profit ($${tp})! Entry: $${entry}. Status: PROFIT!`;
+
+        // 1. Notifikasi Sistem HP / PC
+        sendLocalNotification(title, {
+          body: body,
           tag: `sltp-hit-${trade.TradingID}`,
           requireInteraction: true
         });
+
+        // 2. Bunyikan Suara Chime HP / PC
+        playNotificationChime('tp');
+
+        // 3. Tampilkan Banner & Toast
+        showSLTPHitBannerUI(trade, currentPrice, 'TP');
+        showToast(title, 'success');
       }
     } else if (hitSL) {
       const key = `hit_sl_${trade.TradingID}`;
       if (!tradingState.notifiedProximity[key]) {
         tradingState.notifiedProximity[key] = Date.now();
-        sendLocalNotification(`SINYAL HIT SL: ${trade.Pair} (${buySell})`, {
-          body: `Harga live ($${currentPrice.toFixed(2)}) telah menyentuh Stop Loss ($${sl})! Klik di sini untuk update hasil trade (LOSS).`,
+
+        const title = `🛑 SINYAL HIT STOP LOSS (SL): ${trade.Pair} (${buySell})`;
+        const body = `Harga live ($${currentPrice.toFixed(2)}) MENYENTUH Stop Loss ($${sl})! Entry: $${entry}. Status: LOSS!`;
+
+        // 1. Notifikasi Sistem HP / PC
+        sendLocalNotification(title, {
+          body: body,
           tag: `sltp-hit-${trade.TradingID}`,
           requireInteraction: true
         });
+
+        // 2. Bunyikan Suara Chime HP / PC
+        playNotificationChime('sl');
+
+        // 3. Tampilkan Banner & Toast
+        showSLTPHitBannerUI(trade, currentPrice, 'SL');
+        showToast(title, 'warning');
       }
     } else if (reminderTickCount % 20 === 0) {
       sendLocalNotification(`Evaluasi Trade (5-Min): ${trade.Pair} (${buySell})`, {
@@ -293,6 +317,69 @@ async function evaluateRunningTradesProximity() {
         tag: `5min-reminder-${trade.TradingID}`
       });
     }
+  }
+}
+
+let activeSLTPHitTrade = null;
+
+function showSLTPHitBannerUI(trade, currentPrice, hitType) {
+  activeSLTPHitTrade = trade;
+  const banner = document.getElementById('sltp-hit-alert-banner');
+  const titleEl = document.getElementById('sltp-hit-banner-title');
+  const descEl = document.getElementById('sltp-hit-banner-desc');
+  const iconEl = document.getElementById('sltp-hit-banner-icon');
+  const iconBgEl = document.getElementById('sltp-hit-banner-icon-bg');
+  const btnResolve = document.getElementById('sltp-hit-banner-btn-resolve');
+
+  if (!banner) return;
+
+  const pair = trade.Pair || 'XAUUSD';
+  const buySell = (trade.BuySell || 'BUY').toUpperCase();
+  const entry = Number(trade.Entry) || 0;
+  const tp = Number(trade.TP) || 0;
+  const sl = Number(trade.SL) || 0;
+
+  if (hitType === 'TP') {
+    banner.className = 'bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-emerald-500/20 border-emerald-500/50 rounded-3xl p-4 shadow-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-pulse';
+    if (iconBgEl) iconBgEl.className = 'p-2.5 bg-emerald-500/20 text-emerald-400 rounded-2xl border border-emerald-500/30 flex items-center justify-center';
+    if (iconEl) iconEl.setAttribute('icon', 'lucide:trophy');
+    if (titleEl) {
+      titleEl.className = 'text-sm font-extrabold text-emerald-400 flex items-center gap-2';
+      titleEl.innerHTML = `<span>🎯 SINYAL HIT TAKE PROFIT (TP)!</span> <span class="px-2 py-0.5 bg-emerald-500/30 text-emerald-300 rounded-full text-[10px]">PROFIT</span>`;
+    }
+    if (descEl) descEl.textContent = `[${pair} ${buySell}] Harga live ($${currentPrice.toFixed(2)}) MENCAPAI Target TP ($${tp})! Entry: $${entry}. Selesaikan trade & simpan profit!`;
+    if (btnResolve) {
+      btnResolve.className = 'px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-1.5 whitespace-nowrap';
+      btnResolve.innerHTML = `<iconify-icon icon="lucide:check-circle-2"></iconify-icon> <span>Tutup Posisi (PROFIT)</span>`;
+    }
+  } else {
+    banner.className = 'bg-gradient-to-r from-rose-500/20 via-amber-500/20 to-rose-500/20 border-rose-500/50 rounded-3xl p-4 shadow-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-pulse';
+    if (iconBgEl) iconBgEl.className = 'p-2.5 bg-rose-500/20 text-rose-400 rounded-2xl border border-rose-500/30 flex items-center justify-center';
+    if (iconEl) iconEl.setAttribute('icon', 'lucide:alert-triangle');
+    if (titleEl) {
+      titleEl.className = 'text-sm font-extrabold text-rose-400 flex items-center gap-2';
+      titleEl.innerHTML = `<span>🛑 SINYAL HIT STOP LOSS (SL)!</span> <span class="px-2 py-0.5 bg-rose-500/30 text-rose-300 rounded-full text-[10px]">LOSS</span>`;
+    }
+    if (descEl) descEl.textContent = `[${pair} ${buySell}] Harga live ($${currentPrice.toFixed(2)}) MENYENTUH Stop Loss ($${sl})! Entry: $${entry}. Periksa & selesaikan posisi Anda!`;
+    if (btnResolve) {
+      btnResolve.className = 'px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-1.5 whitespace-nowrap';
+      btnResolve.innerHTML = `<iconify-icon icon="lucide:x-circle"></iconify-icon> <span>Tutup Posisi (LOSS)</span>`;
+    }
+  }
+
+  banner.classList.remove('hidden');
+  banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function dismissSLTPHitBanner() {
+  const banner = document.getElementById('sltp-hit-alert-banner');
+  if (banner) banner.classList.add('hidden');
+}
+
+function resolveSLTPHitTrade() {
+  if (activeSLTPHitTrade && activeSLTPHitTrade.TradingID) {
+    openTradingModal(activeSLTPHitTrade.TradingID);
+    dismissSLTPHitBanner();
   }
 }
 
@@ -312,106 +399,6 @@ function start5MinReminderTimer() {
   // Interval polling real-time setiap 15 detik (15.000 ms) untuk akurasi tinggi di HP
   tradingState.reminder5MinInterval = setInterval(evaluateRunningTradesProximity, 15000);
 }
-
-// High Impact Economic News Calendar & 15-Min Alert Engine
-let newsAlertNotifiedState = {};
-
-const CURATED_HIGH_IMPACT_EVENTS = [
-  { id: 'nfp_usd', title: 'US Non-Farm Payrolls (NFP) & Unemployment Rate', currency: 'USD', impactLevel: 'High Impact', forecast: '185K', previous: '206K', desc: 'Dampak Volatilitas Ekstrem pada XAUUSD, EURUSD, GBPUSD.' },
-  { id: 'cpi_usd', title: 'US Consumer Price Index (CPI Inflation Rate)', currency: 'USD', impactLevel: 'High Impact', forecast: '3.1%', previous: '3.3%', desc: 'Indikator Inflasi Utama penentu Suku Bunga Fed.' },
-  { id: 'fomc_rate', title: 'FOMC Interest Rate Decision & Statement', currency: 'USD', impactLevel: 'Volatilitas Ekstrem', forecast: '5.25%', previous: '5.50%', desc: 'Keputusan Suku Bunga Bank Sentral Amerika (The Fed).' },
-  { id: 'ppi_usd', title: 'US Producer Price Index (PPI MoM)', currency: 'USD', impactLevel: 'High Impact', forecast: '0.2%', previous: '0.0%', desc: 'Indikator Inflasi Tingkat Produsen Amerika.' },
-  { id: 'ecb_rate', title: 'ECB Interest Rate Decision & Press Conference', currency: 'EUR', impactLevel: 'High Impact', forecast: '3.75%', previous: '4.25%', desc: 'Kebijakan Suku Bunga Bank Sentral Eropa.' },
-  { id: 'gdp_usd', title: 'US Gross Domestic Product (GDP QoQ)', currency: 'USD', impactLevel: 'High Impact', forecast: '2.8%', previous: '1.4%', desc: 'Data Pertumbuhan Ekonomi Amerika Serikat.' }
-];
-
-async function fetchLiveEconomicCalendarUI(forceRefresh = false) {
-  const container = document.getElementById('news-calendar-events-container');
-  const spinIcon = document.getElementById('news-spin-icon');
-  if (!container) return;
-
-  if (spinIcon) spinIcon.classList.add('animate-spin');
-
-  try {
-    renderEconomicCalendarList(CURATED_HIGH_IMPACT_EVENTS);
-  } catch (e) {
-    console.warn('[News Calendar Error]', e);
-  } finally {
-    if (spinIcon) spinIcon.classList.remove('animate-spin');
-  }
-}
-
-function renderEconomicCalendarList(events) {
-  const container = document.getElementById('news-calendar-events-container');
-  if (!container) return;
-
-  container.innerHTML = events.map(evt => {
-    const isUsd = evt.currency === 'USD';
-    const badgeBg = isUsd ? 'bg-indigo-500/10 text-indigo-500 border-indigo-500/30' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30';
-
-    return `
-      <div class="p-4 bg-zinc-50 dark:bg-zinc-950/80 rounded-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col justify-between gap-3 hover:border-rose-500/40 transition">
-        <div class="space-y-1.5">
-          <div class="flex items-center justify-between gap-2">
-            <span class="px-2.5 py-0.5 rounded-md font-bold text-[10px] border ${badgeBg}">${evt.currency}</span>
-            <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] bg-rose-500/10 text-rose-500 border border-rose-500/30">${evt.impactLevel}</span>
-          </div>
-          <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-xs leading-snug mt-1">${evt.title}</h4>
-          <p class="text-[11px] text-zinc-400 leading-tight">${evt.desc}</p>
-        </div>
-
-        <div class="pt-2 border-t border-zinc-200 dark:border-zinc-800/80 flex items-center justify-between text-[11px]">
-          <div class="space-x-2 text-zinc-500">
-            <span>Est: <strong class="text-zinc-800 dark:text-zinc-200">${evt.forecast}</strong></span>
-            <span>Prev: <strong class="text-zinc-800 dark:text-zinc-200">${evt.previous}</strong></span>
-          </div>
-          <button onclick="trigger15MinNewsAlertTest('${evt.title}', '${evt.currency}')" class="text-rose-500 hover:text-rose-400 font-bold text-[11px] flex items-center gap-1 bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1 rounded-lg border border-rose-500/20 transition" title="Klik untuk menguji notifikasi 15 menit sebelum berita rilis">
-            <iconify-icon icon="lucide:bell-ring" class="text-xs"></iconify-icon>
-            <span>Uji Alert 15m</span>
-          </button>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function trigger15MinNewsAlertTest(title, currency) {
-  const alertTitle = `PERINGATAN BERITA HIGH IMPACT (15-MIN ALERT)!`;
-  const alertBody = `[${currency}] Berita ${title} akan rilis dalam 15 menit! Waspadai volatilitas harga ekstrem pada XAUUSD & Pair ${currency}!`;
-
-  sendLocalNotification(alertTitle, {
-    body: alertBody,
-    tag: `news-alert-test-${Date.now()}`,
-    requireInteraction: true
-  });
-
-  showNewsWarningBannerUI(title, currency, 15);
-  showToast('Sinyal notifikasi 15 menit sebelum berita berhasil diuji & dikirim!', 'success');
-}
-
-function showNewsWarningBannerUI(title, currency, minsLeft) {
-  const banner = document.getElementById('news-warning-banner');
-  const bannerTitle = document.getElementById('news-banner-title');
-  const bannerDesc = document.getElementById('news-banner-desc');
-
-  if (banner && bannerTitle && bannerDesc) {
-    bannerTitle.textContent = `PERINGATAN BERITA HIGH IMPACT (${minsLeft}-MIN ALERT)!`;
-    bannerDesc.textContent = `[${currency}] Berita ${title} akan rilis dalam ${minsLeft} menit. Waspadai pergerakan harga & volatilitas ekstrem!`;
-    banner.classList.remove('hidden');
-    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-}
-
-function dismissNewsBanner() {
-  const banner = document.getElementById('news-warning-banner');
-  if (banner) banner.classList.add('hidden');
-}
-
-function refreshEconomicCalendarUI() {
-  fetchLiveEconomicCalendarUI(true);
-  showToast('Kalender Berita High Impact berhasil diperbarui!', 'success');
-}
-
 let currentTradingViewTimeframe = '5';
 
 // TradingView Widget Generator (Support Timeframe 5m, 30m, Daily & Drawing Toolbar)

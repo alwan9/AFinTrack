@@ -9,12 +9,12 @@ const AFINTRACK_API_URL = "https://script.google.com/macros/s/AKfycbzVOmPHhy0R03
 const SESSION_KEY = "AFINTRACK_ACTIVE_SESSION";
 const COOKIE_NAME = "AFINTRACK_AUTH_TOKEN";
 
-// Helper Pengelola Cookie 1 Tahun (365 Hari Persistent Auto-Login)
+// Helper Pengelola Cookie Permanen (Persistent Auto-Login Tanpa Expiry)
 function setAuthCookie(sessionData) {
   try {
     const jsonStr = encodeURIComponent(JSON.stringify(sessionData));
-    // Set cookie berlaku 1 tahun (31.536.000 detik)
-    document.cookie = `${COOKIE_NAME}=${jsonStr}; max-age=31536000; path=/; SameSite=Lax`;
+    // Set cookie berlaku 10 tahun (315.360.000 detik) agar tidak pernah ter-logout otomatis
+    document.cookie = `${COOKIE_NAME}=${jsonStr}; max-age=315360000; path=/; SameSite=Lax`;
   } catch (e) {
     console.warn('[Cookie Write Error]', e);
   }

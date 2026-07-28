@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initUserInfo();
   checkSuperAdmin();
   renderDashboardSkeleton();
+  fetchLiveEconomicCalendarUI();
   await loadDashboardData();
 });
 
