@@ -409,11 +409,14 @@ function calculateTradingPnL(trade, exitPriceVal = 0) {
   const rate = typeof getLiveUsdIdrRate === 'function' ? getLiveUsdIdrRate() : 16250;
 
   let finalPL = pnlUSD;
-  if (settings.currency !== 'USD') {
+  if (settings.currency === 'USC') {
+    // Akun Cent (1 USD = 100 USC Cents)
+    finalPL = pnlUSD * 100;
+  } else if (settings.currency === 'IDR') {
     finalPL = pnlUSD * rate;
   }
 
-  return Math.round(finalPL);
+  return Math.round(finalPL * 10) / 10;
 }
 
 // Auto-Close Trade Position saat Menyentuh SL / TP
@@ -717,7 +720,7 @@ function autoCalculateSLTP(force = false) {
   let pipSize = getPipSize(pair, entryVal);
 
   const appSettings = typeof getAppSettings === 'function' ? getAppSettings() : {};
-  const slPips = Number(appSettings.defaultSLPips) || 100;
+  const slPips = Number(appSettings.defaultSLPips) || 50;
   const tpPips = slPips * rrRatio;
 
   const tpDistance = tpPips * pipSize;
@@ -848,18 +851,39 @@ function renderStatsSummary() {
   });
 
   const closedItems = items.filter(t => t.Status !== 'RUNNING');
-  const winRate = closedItems.length > 0 ? ((winCount / closedItems.length) * 100).toFixed(1) : 0;
+  const winRate = closedItems.length > 0 ? ((winCount / closedItems.length) * 100).toFixed(1) : '0.0';
 
-  const statCountEl = document.getElementById('stat-trade-count');
-  const statWinrateEl = document.getElementById('stat-winrate');
+  const appSettings = typeof getAppSettings === 'function' ? getAppSettings() : {};
+  const capital = Number(appSettings.tradingCapital) || 553;
+  const netPnL = totalProfit - totalLoss;
+  const totalEquity = capital + netPnL;
+  const growthPct = capital > 0 ? ((netPnL / capital) * 100).toFixed(1) : '0.0';
+  const growthSign = Number(growthPct) >= 0 ? '+' : '';
+
+  const capitalEl = document.getElementById('stat-trading-capital');
   const statProfitEl = document.getElementById('stat-total-pl');
+  const equityEl = document.getElementById('stat-total-equity');
+  const statWinrateEl = document.getElementById('stat-winrate');
+  const statCountEl = document.getElementById('stat-trade-count');
 
-  if (statCountEl) statCountEl.textContent = `${items.length} Trade (${items.filter(i => i.Status === 'RUNNING').length} Running)`;
-  if (statWinrateEl) statWinrateEl.textContent = `${winRate}%`;
+  if (capitalEl) {
+    capitalEl.innerHTML = isPrivacyMode() ? '•••••••' : formatIDR(capital, false, true);
+  }
   if (statProfitEl) {
-    const net = totalProfit - totalLoss;
-    statProfitEl.textContent = isPrivacyMode() ? 'Rp •••••••' : ((net >= 0 ? '+' : '') + formatIDR(net));
-    statProfitEl.className = `text-lg font-bold ${net >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+    const prefix = netPnL >= 0 ? '+' : '';
+    statProfitEl.innerHTML = isPrivacyMode() ? '•••••••' : (prefix + formatIDR(netPnL, false, true));
+    statProfitEl.className = `text-xs sm:text-base font-extrabold ${netPnL >= 0 ? 'text-emerald-500' : 'text-rose-500'}`;
+  }
+  if (equityEl) {
+    const formattedEquity = isPrivacyMode() ? '•••••••' : formatIDR(totalEquity, false, true);
+    equityEl.innerHTML = `${formattedEquity}<span class="block text-xs font-semibold text-indigo-400 mt-0.5 font-sans">Growth: ${growthSign}${growthPct}%</span>`;
+    equityEl.className = `text-xs sm:text-base font-extrabold ${totalEquity >= capital ? 'text-indigo-500' : 'text-rose-400'}`;
+  }
+  if (statWinrateEl) {
+    statWinrateEl.textContent = `${winRate}% (${items.length} Trade)`;
+  }
+  if (statCountEl) {
+    statCountEl.textContent = `${items.length} Trade (${items.filter(i => i.Status === 'RUNNING').length} Running)`;
   }
 }
 
@@ -892,8 +916,9 @@ function getOrCalculateSLTP(item) {
 
     let pipSize = getPipSize(pair, entryVal);
 
-    const slPips = 100;
-    const tpPips = 100 * rrRatio;
+    const appSettings = typeof getAppSettings === 'function' ? getAppSettings() : {};
+    const slPips = Number(appSettings.defaultSLPips) || 50;
+    const tpPips = slPips * rrRatio;
     const tpDistance = tpPips * pipSize;
     const slDistance = slPips * pipSize;
 
@@ -1223,6 +1248,98 @@ function formatDateForInput(dateStr) {
   } catch (e) {}
   return String(dateStr).split('T')[0];
 }
+
+// --- Handler Modal Deposit / Atur Modal Trading ---
+function openDepositModal() {
+  const modal = document.getElementById('deposit-modal');
+  if (!modal) return;
+
+  const appSettings = typeof getAppSettings === 'function' ? getAppSettings() : {};
+  const currentCapital = Number(appSettings.tradingCapital) || 553;
+
+  const inputAmount = document.getElementById('input-deposit-amount');
+  const currLabel = document.getElementById('deposit-currency-label');
+
+  if (currLabel) currLabel.textContent = appSettings.currency || 'USC';
+  if (inputAmount) inputAmount.value = currentCapital;
+
+  updateDepositEquivPreview();
+  modal.classList.remove('hidden');
+}
+
+function closeDepositModal() {
+  const modal = document.getElementById('deposit-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function selectDepositPreset(amountUSC) {
+  const appSettings = typeof getAppSettings === 'function' ? getAppSettings() : {};
+  const inputAmount = document.getElementById('input-deposit-amount');
+
+  if (!inputAmount) return;
+
+  if (appSettings.currency === 'IDR') {
+    inputAmount.value = Math.round(convertUSCToIDR(amountUSC));
+  } else {
+    inputAmount.value = amountUSC;
+  }
+  updateDepositEquivPreview();
+}
+
+function updateDepositEquivPreview() {
+  const preview = document.getElementById('deposit-equiv-preview');
+  const inputAmount = document.getElementById('input-deposit-amount');
+  if (!preview || !inputAmount) return;
+
+  const val = parseFloat(inputAmount.value) || 0;
+  const appSettings = typeof getAppSettings === 'function' ? getAppSettings() : {};
+  const curr = appSettings.currency || 'USC';
+
+  if (curr === 'USC') {
+    const idrEquiv = convertUSCToIDR(val);
+    const formattedIDR = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(idrEquiv);
+    preview.textContent = `Ekuivalen: ${formattedIDR}`;
+  } else if (curr === 'IDR') {
+    const uscEquiv = convertIDRToUSC(val);
+    const formattedUSC = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(uscEquiv) + ' USC';
+    preview.textContent = `Ekuivalen: ${formattedUSC}`;
+  } else {
+    preview.textContent = '';
+  }
+}
+
+function saveDepositForm(event) {
+  if (event) event.preventDefault();
+
+  const inputAmount = document.getElementById('input-deposit-amount');
+  const newCapital = parseFloat(inputAmount?.value) || 0;
+
+  if (newCapital <= 0) {
+    showToast('Masukkan jumlah deposit modal yang valid.', 'warning');
+    return;
+  }
+
+  const currentSettings = typeof getAppSettings === 'function' ? getAppSettings() : {};
+  const updatedSettings = {
+    ...currentSettings,
+    tradingCapital: newCapital
+  };
+
+  if (typeof saveAppSettings === 'function') {
+    saveAppSettings(updatedSettings);
+  }
+
+  closeDepositModal();
+  renderStatsSummary();
+  showToast('Deposit Modal Trading berhasil disimpan!', 'success');
+}
+
+// Global window bindings untuk akses langsung dari HTML onclick event
+window.openDepositModal = openDepositModal;
+window.closeDepositModal = closeDepositModal;
+window.selectDepositPreset = selectDepositPreset;
+window.updateDepositEquivPreview = updateDepositEquivPreview;
+window.saveDepositForm = saveDepositForm;
 
 // Modal Handlers
 function openTradingModal(tradingID = null) {

@@ -107,31 +107,44 @@
         <p class="text-xs text-zinc-400">Catat posisi RUNNING & CLOSED dengan kalkulasi otomatis SL (-50p) & TP (+100p).
         </p>
       </div>
-      <button id="btn-add-trading" onclick="openTradingModal()"
-        class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
-        <iconify-icon icon="lucide:plus" class="text-base"></iconify-icon>
-        <span>+ Entry Posisi Baru</span>
-      </button>
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="btn-deposit-modal" onclick="openDepositModal()"
+          class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-1.5"
+          title="Atur / Deposit Modal Trading">
+          <iconify-icon icon="lucide:wallet" class="text-base"></iconify-icon>
+          <span>Deposit / Modal</span>
+        </button>
+        <button id="btn-add-trading" onclick="openTradingModal()"
+          class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
+          <iconify-icon icon="lucide:plus" class="text-base"></iconify-icon>
+          <span>+ Entry Posisi Baru</span>
+        </button>
+      </div>
     </div>
 
-    <!-- Quick Stats Bar (3 Kolom Sejajar di HP & Desktop) -->
-    <div class="grid grid-cols-3 gap-2 sm:gap-4">
+    <!-- Quick Stats Bar (4 Kolom Sejajar di HP & Desktop) -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
       <div
         class="bg-white dark:bg-zinc-900 p-2.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center flex flex-col justify-center">
-        <span class="text-[9px] sm:text-[11px] font-bold text-zinc-400 uppercase tracking-tight">Jumlah Trade</span>
-        <p id="stat-trade-count"
-          class="text-xs sm:text-lg font-extrabold text-zinc-800 dark:text-zinc-100 truncate mt-0.5">0 Trade</p>
-      </div>
-      <div
-        class="bg-white dark:bg-zinc-900 p-2.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center flex flex-col justify-center">
-        <span class="text-[9px] sm:text-[11px] font-bold text-zinc-400 uppercase tracking-tight">Win Rate
-          (Closed)</span>
-        <p id="stat-winrate" class="text-xs sm:text-lg font-extrabold text-indigo-500 truncate mt-0.5">0.0%</p>
+        <span class="text-[9px] sm:text-[11px] font-bold text-zinc-400 uppercase tracking-tight">Modal Trading</span>
+        <p id="stat-trading-capital"
+          class="text-xs sm:text-base font-extrabold text-amber-500 truncate mt-0.5">553 USC</p>
       </div>
       <div
         class="bg-white dark:bg-zinc-900 p-2.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center flex flex-col justify-center">
         <span class="text-[9px] sm:text-[11px] font-bold text-zinc-400 uppercase tracking-tight">Net Realized P/L</span>
-        <p id="stat-total-pl" class="text-xs sm:text-lg font-extrabold text-emerald-500 truncate mt-0.5">Rp 0</p>
+        <p id="stat-total-pl" class="text-xs sm:text-base font-extrabold text-emerald-500 truncate mt-0.5">0 USC</p>
+      </div>
+      <div
+        class="bg-white dark:bg-zinc-900 p-2.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center flex flex-col justify-center">
+        <span class="text-[9px] sm:text-[11px] font-bold text-zinc-400 uppercase tracking-tight">Total Equity (Growth)</span>
+        <p id="stat-total-equity" class="text-xs sm:text-base font-extrabold text-indigo-500 truncate mt-0.5">553 USC (0%)</p>
+      </div>
+      <div
+        class="bg-white dark:bg-zinc-900 p-2.5 sm:p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center flex flex-col justify-center">
+        <span class="text-[9px] sm:text-[11px] font-bold text-zinc-400 uppercase tracking-tight">Win Rate & Trades</span>
+        <p id="stat-winrate" class="text-xs sm:text-base font-extrabold text-zinc-800 dark:text-zinc-100 truncate mt-0.5">0% (0 Trade)</p>
+        <span id="stat-trade-count" class="hidden">0 Trade</span>
       </div>
     </div>
 
@@ -289,6 +302,77 @@
 
   </main>
 
+  <!-- Modal Deposit / Atur Modal Trading -->
+  <div id="deposit-modal"
+    class="fixed inset-0 bg-zinc-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div
+      class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4">
+
+      <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+            <iconify-icon icon="lucide:wallet" class="text-xl"></iconify-icon>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Deposit / Modal Trading</h3>
+            <p class="text-[11px] text-zinc-400">Atur saldo modal awal akun trading Anda.</p>
+          </div>
+        </div>
+        <button onclick="closeDepositModal()" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
+          <iconify-icon icon="lucide:x" class="text-lg"></iconify-icon>
+        </button>
+      </div>
+
+      <form id="deposit-form" onsubmit="saveDepositForm(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Jumlah Deposit Modal (<span id="deposit-currency-label">USC</span>)</label>
+          <input type="number" step="any" id="input-deposit-amount" required placeholder="553"
+            oninput="updateDepositEquivPreview()"
+            class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-100 font-bold text-base">
+          <p id="deposit-equiv-preview" class="text-[11px] text-amber-500 font-semibold mt-1">Ekuivalen: Rp 100.000 IDR</p>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Preset Pilihan Cepat Modal:</label>
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <button type="button" onclick="selectDepositPreset(553)"
+              class="p-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-emerald-500/10 hover:border-emerald-500/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-left font-bold transition">
+              <span class="block text-emerald-500">553 USC</span>
+              <span class="text-[10px] text-zinc-400">Rp 100.000 IDR</span>
+            </button>
+            <button type="button" onclick="selectDepositPreset(1106)"
+              class="p-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-emerald-500/10 hover:border-emerald-500/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-left font-bold transition">
+              <span class="block text-emerald-500">1.106 USC</span>
+              <span class="text-[10px] text-zinc-400">Rp 200.000 IDR</span>
+            </button>
+            <button type="button" onclick="selectDepositPreset(2765)"
+              class="p-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-emerald-500/10 hover:border-emerald-500/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-left font-bold transition">
+              <span class="block text-emerald-500">2.765 USC</span>
+              <span class="text-[10px] text-zinc-400">Rp 500.000 IDR</span>
+            </button>
+            <button type="button" onclick="selectDepositPreset(5530)"
+              class="p-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-emerald-500/10 hover:border-emerald-500/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-left font-bold transition">
+              <span class="block text-emerald-500">5.530 USC</span>
+              <span class="text-[10px] text-zinc-400">Rp 1.000.000 IDR</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+          <button type="button" onclick="closeDepositModal()"
+            class="flex-1 py-2.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold rounded-xl hover:bg-zinc-200 transition">
+            Batal
+          </button>
+          <button type="submit"
+            class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-1.5">
+            <iconify-icon icon="lucide:check-circle-2" class="text-base"></iconify-icon>
+            <span>Simpan Deposit Modal</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal CRUD Form Trading -->
   <div id="trading-modal"
     class="fixed inset-0 bg-zinc-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
@@ -401,11 +485,11 @@
             <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Risk : Reward</label>
             <select id="input-rr" onchange="autoCalculateSLTP(true)"
               class="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-100 font-bold">
-              <option value="1:1">1:1 (TP +100p)</option>
-              <option value="1:2" selected>1:2 (TP +200p)</option>
-              <option value="1:3">1:3 (TP +300p)</option>
-              <option value="1:4">1:4 (TP +400p)</option>
-              <option value="1:5">1:5 (TP +500p)</option>
+              <option value="1:1">1:1 (TP +50p)</option>
+              <option value="1:2" selected>1:2 (TP +100p)</option>
+              <option value="1:3">1:3 (TP +150p)</option>
+              <option value="1:4">1:4 (TP +200p)</option>
+              <option value="1:5">1:5 (TP +250p)</option>
             </select>
           </div>
         </div>
@@ -503,9 +587,9 @@
     </div>
   </div>
 
-  <script src="js/helper.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/trading.js"></script>
+  <script src="js/helper.js?v=1.1"></script>
+  <script src="js/auth.js?v=1.1"></script>
+  <script src="js/trading.js?v=1.1"></script>
 </body>
 
 </html>

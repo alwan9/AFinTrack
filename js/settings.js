@@ -50,14 +50,14 @@ async function initSettingsUI() {
   if (privacyCheck) privacyCheck.checked = isPrivacyMode();
 
   const currSelect = document.getElementById('setting-currency-format');
-  if (currSelect) currSelect.value = settings.currency || 'IDR';
+  if (currSelect) currSelect.value = settings.currency || 'USC';
 
   // 2. Default Trading
   const rrSelect = document.getElementById('setting-default-rr');
   if (rrSelect) rrSelect.value = settings.defaultRR || '1:2';
 
   const slPipsInput = document.getElementById('setting-default-slpips');
-  if (slPipsInput) slPipsInput.value = settings.defaultSLPips || 100;
+  if (slPipsInput) slPipsInput.value = settings.defaultSLPips || 50;
 
   const lotInput = document.getElementById('setting-default-lot');
   if (lotInput) lotInput.value = settings.defaultLot || 0.01;
@@ -118,9 +118,9 @@ function saveAllSettingsFromUI() {
 
   const updatedSettings = {
     ...currentSettings,
-    currency: document.getElementById('setting-currency-format')?.value || 'IDR',
+    currency: document.getElementById('setting-currency-format')?.value || 'USC',
     defaultRR: document.getElementById('setting-default-rr')?.value || '1:2',
-    defaultSLPips: Number(document.getElementById('setting-default-slpips')?.value) || 100,
+    defaultSLPips: Number(document.getElementById('setting-default-slpips')?.value) || 50,
     defaultLot: Number(document.getElementById('setting-default-lot')?.value) || 0.01,
     defaultPair: (document.getElementById('setting-default-pair')?.value || 'XAUUSD').toUpperCase().trim()
   };
@@ -167,8 +167,6 @@ async function testServerConnectionUI() {
   } finally {
     if (spinner) spinner.classList.remove('animate-spin');
   }
-}
-
 }
 
 function clearWebCookies() {

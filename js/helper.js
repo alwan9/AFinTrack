@@ -135,48 +135,106 @@ async function fetchLiveExchangeRate(forceRefresh = false) {
   return getLiveUsdIdrRate();
 }
 
-function formatPrivacyIDR(amount, isUsdBase = false) {
+// Konversi USC (Cent) <-> IDR (Rupiah) berdasarkan Ketentuan 553 USC = Rp 100.000
+const USC_PER_100K_IDR = 553;
+const IDR_PER_USC = 100000 / 553; // ~180.8318264 IDR per 1 USC
+
+function convertUSCToIDR(uscVal) {
+  const num = parseFloat(uscVal) || 0;
+  return num * IDR_PER_USC;
+}
+
+function convertIDRToUSC(idrVal) {
+  const num = parseFloat(idrVal) || 0;
+  return num * (USC_PER_100K_IDR / 100000);
+}
+
+function formatPrivacyIDR(amount, isUsdBase = false, includeSubEquiv = false) {
   const settings = typeof getAppSettings === 'function' ? getAppSettings() : {};
-  const currSymbol = (settings.currency === 'USD') ? '$' : 'Rp';
+  const currSymbol = settings.currency === 'USD' ? '$' : (settings.currency === 'IDR' ? 'Rp' : 'USC');
   if (isPrivacyMode()) {
     return `${currSymbol} •••••••`;
   }
-  return formatIDR(amount, isUsdBase);
+  return formatIDR(amount, isUsdBase, includeSubEquiv);
 }
 
 // Inisialisasi Tema & Privacy & Live Kurs saat DOM Siap
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   updatePrivacyIcon(isPrivacyMode());
+  updateCurrencyToggleBtnUI();
   initOfflineSyncEngine();
   initPwaInstallBanner();
   fetchLiveExchangeRate();
 });
 
-// Format Currency (Dinamis IDR / USD dari Settings dengan Kurs Global Realtime)
-function formatIDR(amount, isUsdBase = false) {
+// Format Currency (Dinamis USC / IDR / USD dari Settings)
+function formatIDR(amount, isUsdBase = false, includeSubEquiv = false) {
   const num = parseFloat(amount) || 0;
   const settings = typeof getAppSettings === 'function' ? getAppSettings() : {};
-  const curr = settings.currency || 'IDR';
-  const rate = getLiveUsdIdrRate();
+  let curr = settings.currency || 'USC';
+
+  if (curr !== 'USC' && curr !== 'IDR' && curr !== 'USD') {
+    curr = 'USC';
+  }
+
+  let uscVal = num;
+  let idrVal = convertUSCToIDR(num);
+  let usdVal = num / 100;
+
+  if (isUsdBase) {
+    usdVal = num;
+    uscVal = num * 100;
+    idrVal = convertUSCToIDR(uscVal);
+  }
+
+  const formattedUSC = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(uscVal) + ' USC';
+  const formattedIDR = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(idrVal);
+  const formattedUSD = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(usdVal);
 
   if (curr === 'USD') {
-    // Jika mata uang aktif USD
-    const valInUSD = isUsdBase ? num : (rate > 0 ? (num / rate) : (num / 16250));
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 2
-    }).format(valInUSD);
+    if (includeSubEquiv) {
+      return `${formattedUSD}<span class="block text-xs font-semibold text-zinc-400 dark:text-zinc-400 mt-0.5 font-sans opacity-90">≈ ${formattedIDR} IDR</span>`;
+    }
+    return formattedUSD;
+  } else if (curr === 'IDR') {
+    if (includeSubEquiv) {
+      return `${formattedIDR}<span class="block text-xs font-semibold text-zinc-400 dark:text-zinc-400 mt-0.5 font-sans opacity-90">≈ ${formattedUSC}</span>`;
+    }
+    return formattedIDR;
   } else {
-    // Jika mata uang aktif IDR
-    const valInIDR = isUsdBase ? (num * rate) : num;
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 0
-    }).format(valInIDR);
+    // Default: USC
+    if (includeSubEquiv) {
+      return `${formattedUSC}<span class="block text-xs font-semibold text-zinc-400 dark:text-zinc-400 mt-0.5 font-sans opacity-90">≈ ${formattedIDR} IDR</span>`;
+    }
+    return formattedUSC;
   }
+}
+
+// Quick Currency Switcher: Toggle Antara USC <-> IDR <-> USD
+function toggleCurrencyView() {
+  const currentSettings = typeof getAppSettings === 'function' ? getAppSettings() : {};
+  const newCurr = (currentSettings.currency === 'USC') ? 'IDR' : (currentSettings.currency === 'IDR' ? 'USD' : 'USC');
+  const updated = { ...currentSettings, currency: newCurr };
+  saveAppSettings(updated);
+
+  updateCurrencyToggleBtnUI();
+  showToast(`Mata Uang Tampilan Diubah Ke: ${newCurr}`, 'info');
+
+  if (typeof loadDashboardData === 'function') loadDashboardData();
+  if (typeof loadTradingData === 'function') loadTradingData();
+  if (typeof loadFinanceData === 'function') loadFinanceData();
+  if (typeof populateSettingsFromUI === 'function') populateSettingsFromUI();
+}
+
+function updateCurrencyToggleBtnUI() {
+  const btnText = document.getElementById('currency-toggle-text');
+  const btnBadge = document.getElementById('currency-toggle-badge');
+  const settings = typeof getAppSettings === 'function' ? getAppSettings() : {};
+  const curr = settings.currency || 'USC';
+
+  if (btnText) btnText.textContent = curr;
+  if (btnBadge) btnBadge.textContent = curr === 'USC' ? 'Cent' : (curr === 'IDR' ? 'Rupiah' : 'Dollar');
 }
 
 // Sanitasi XSS untuk Tampilan Frontend
@@ -565,9 +623,10 @@ function getAppSettingsKey() {
 function getAppSettings() {
   try {
     const defaultSettings = {
-      currency: 'IDR',
+      currency: 'USC',
+      tradingCapital: 553,
       defaultRR: '1:2',
-      defaultSLPips: 100,
+      defaultSLPips: 50,
       defaultLot: 0.01,
       defaultPair: 'XAUUSD'
     };
@@ -576,9 +635,10 @@ function getAppSettings() {
     return saved ? { ...defaultSettings, ...saved } : defaultSettings;
   } catch (e) {
     return {
-      currency: 'IDR',
+      currency: 'USC',
+      tradingCapital: 553,
       defaultRR: '1:2',
-      defaultSLPips: 100,
+      defaultSLPips: 50,
       defaultLot: 0.01,
       defaultPair: 'XAUUSD'
     };
@@ -691,6 +751,8 @@ function applyPermissionGuards(pageName) {
     if (pageName === 'Trading' && perms.CRUDTrading === false) {
       const btnAdd = document.getElementById('btn-add-trading');
       if (btnAdd) btnAdd.classList.add('hidden');
+      const btnDeposit = document.getElementById('btn-deposit-modal');
+      if (btnDeposit) btnDeposit.classList.add('hidden');
     }
     if (pageName === 'Finance' && perms.CRUDFinance === false) {
       const btnAdd = document.getElementById('btn-add-finance');

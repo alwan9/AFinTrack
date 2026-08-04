@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id" class="dark">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,38 +15,47 @@
   </script>
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 antialiased min-h-screen flex flex-col transition-colors duration-200">
 
+<body
+  class="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 antialiased min-h-screen flex flex-col transition-colors duration-200">
   <!-- Header Navbar -->
-  <header class="sticky top-0 z-40 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 shadow-sm">
+  <header
+    class="sticky top-0 z-40 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      
+
       <!-- Brand Logo -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-bold text-xl shadow-md shadow-indigo-600/30">
+        <div
+          class="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-bold text-xl shadow-md shadow-indigo-600/30">
           <iconify-icon icon="lucide:wallet" class="text-xl"></iconify-icon>
         </div>
         <div>
-          <h1 class="text-base font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight leading-none">AFinTrack</h1>
+          <h1 class="text-base font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight leading-none">AFinTrack
+          </h1>
           <p class="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">Personal Finance & Trading</p>
         </div>
       </div>
 
       <!-- Desktop Navigation Menu -->
-      <nav class="hidden md:flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800/80 p-1 rounded-xl border border-zinc-200 dark:border-zinc-700/60">
-        <a id="nav-dash-link" href="dashboard.html" class="px-4 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-white dark:bg-zinc-900 rounded-lg shadow-sm flex items-center gap-1.5">
+      <nav
+        class="hidden md:flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800/80 p-1 rounded-xl border border-zinc-200 dark:border-zinc-700/60">
+        <a id="nav-dash-link" href="dashboard.html"
+          class="px-4 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-white dark:bg-zinc-900 rounded-lg shadow-sm flex items-center gap-1.5">
           <iconify-icon icon="lucide:layout-dashboard"></iconify-icon>
           <span>Dashboard</span>
         </a>
-        <a id="nav-trade-link" href="trading.html" class="px-4 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition flex items-center gap-1.5">
+        <a id="nav-trade-link" href="trading.html"
+          class="px-4 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition flex items-center gap-1.5">
           <iconify-icon icon="lucide:candlestick-chart"></iconify-icon>
           <span>Progress Trading</span>
         </a>
-        <a id="nav-fin-link" href="finance.html" class="px-4 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition flex items-center gap-1.5">
+        <a id="nav-fin-link" href="finance.html"
+          class="px-4 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition flex items-center gap-1.5">
           <iconify-icon icon="lucide:wallet-cards"></iconify-icon>
           <span>Kelola Keuangan</span>
         </a>
-        <a id="nav-admin-link" href="admin.html" class="hidden px-3.5 py-2 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-lg transition flex items-center gap-1.5">
+        <a id="nav-admin-link" href="admin.html"
+          class="hidden px-3.5 py-2 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-lg transition flex items-center gap-1.5">
           <iconify-icon icon="lucide:shield-check"></iconify-icon>
           <span>Panel Admin</span>
         </a>
@@ -53,23 +63,31 @@
 
       <!-- Right Action Tools & Theme Switcher -->
       <div class="flex items-center gap-3">
-        <button id="btn-privacy-toggle" onclick="togglePrivacyMode()" class="p-2 text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition text-base flex items-center justify-center" title="Privacy Mode (Sembunyikan Saldo)">
+        <button id="btn-privacy-toggle" onclick="togglePrivacyMode()"
+          class="p-2 text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition text-base flex items-center justify-center"
+          title="Privacy Mode (Sembunyikan Saldo)">
           <iconify-icon icon="lucide:eye" class="text-lg text-zinc-400"></iconify-icon>
         </button>
 
-        <button id="btn-theme-toggle" onclick="toggleTheme()" class="p-2 text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition text-base flex items-center justify-center" title="Toggle Theme">
+        <button id="btn-theme-toggle" onclick="toggleTheme()"
+          class="p-2 text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition text-base flex items-center justify-center"
+          title="Toggle Theme">
           <iconify-icon icon="lucide:moon" class="text-lg text-indigo-300"></iconify-icon>
         </button>
 
-        <a id="nav-settings-link" href="settings.html" class="p-2 text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition text-base flex items-center justify-center" title="Pengaturan Aplikasi">
+        <a id="nav-settings-link" href="settings.html"
+          class="p-2 text-zinc-500 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition text-base flex items-center justify-center"
+          title="Pengaturan Aplikasi">
           <iconify-icon icon="lucide:settings" class="text-lg text-zinc-400"></iconify-icon>
         </a>
 
         <div class="text-right hidden sm:block border-l border-zinc-200 dark:border-zinc-800 pl-3">
           <p id="user-display-name" class="text-xs font-bold text-zinc-800 dark:text-zinc-200">User</p>
-          <p id="user-display-role" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold uppercase tracking-wider">Member</p>
+          <p id="user-display-role"
+            class="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold uppercase tracking-wider">Member</p>
         </div>
-        <button onclick="logout()" title="Keluar" class="p-2 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl transition flex items-center justify-center">
+        <button onclick="logout()" title="Keluar"
+          class="p-2 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl transition flex items-center justify-center">
           <iconify-icon icon="lucide:log-out" class="text-lg"></iconify-icon>
         </button>
       </div>
@@ -81,45 +99,54 @@
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
     <!-- Super Admin Management Banner (Khusus Super Admin) -->
-    <div id="superadmin-banner" class="hidden bg-gradient-to-r from-indigo-950 via-zinc-900 to-zinc-900 border border-indigo-500/30 p-5 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+    <div id="superadmin-banner"
+      class="hidden bg-gradient-to-r from-indigo-950 via-zinc-900 to-zinc-900 border border-indigo-500/30 p-5 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded-2xl flex items-center justify-center font-bold text-xl">
+        <div
+          class="w-10 h-10 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded-2xl flex items-center justify-center font-bold text-xl">
           <iconify-icon icon="lucide:shield-check"></iconify-icon>
         </div>
         <div>
           <h3 class="text-sm font-extrabold text-zinc-100 flex items-center gap-1.5">
             <span>Panel Super Admin</span>
-            <span class="px-2 py-0.5 text-[9px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-full">Pro</span>
+            <span
+              class="px-2 py-0.5 text-[9px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-full">Pro</span>
           </h3>
-          <p class="text-xs text-zinc-400">Atur siapa saja pengguna terdaftar dan kelola matriks izin akses (Permission Matrix) mereka.</p>
+          <p class="text-xs text-zinc-400">Atur siapa saja pengguna terdaftar dan kelola matriks izin akses (Permission
+            Matrix) mereka.</p>
         </div>
       </div>
-      <button onclick="openPermissionModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-2xl shadow-md transition flex items-center gap-1.5 whitespace-nowrap">
+      <button onclick="openPermissionModal()"
+        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-2xl shadow-md transition flex items-center gap-1.5 whitespace-nowrap">
         <iconify-icon icon="lucide:users-round" class="text-base"></iconify-icon>
         <span>Kelola Pengguna & Izin</span>
       </button>
     </div>
 
     <!-- Welcome Header Banner -->
-    <div class="bg-gradient-to-r from-indigo-950 via-zinc-900 to-zinc-950 border border-zinc-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+    <div
+      class="bg-gradient-to-r from-indigo-950 via-zinc-900 to-zinc-950 border border-zinc-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
       <div class="absolute right-4 bottom-4 opacity-10 pointer-events-none">
         <iconify-icon icon="lucide:bar-chart-4" class="text-[12rem] text-indigo-400"></iconify-icon>
       </div>
       <div class="relative z-10 max-w-xl">
-        <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 w-max mb-3">
+        <span
+          class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 w-max mb-3">
           <iconify-icon icon="lucide:sparkles"></iconify-icon>
           <span>Ringkasan Aktivitas</span>
         </span>
         <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Monitoring Keuangan & Trading</h2>
-        <p class="text-zinc-300 text-xs sm:text-sm mt-2">Pantau performa jurnal transaksi, win rate trading, dan total saldo kamu dalam satu tampilan modern.</p>
+        <p class="text-zinc-300 text-xs sm:text-sm mt-2">Pantau performa jurnal transaksi, win rate trading, dan total
+          saldo kamu dalam satu tampilan modern.</p>
       </div>
     </div>
 
     <!-- Summary Statistic Cards Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-      
+
       <!-- Total Profit Card -->
-      <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition">
+      <div
+        class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition">
         <div class="flex items-center justify-between mb-3">
           <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Total Profit</span>
           <div class="p-2.5 bg-emerald-500/10 text-emerald-500 rounded-xl flex items-center justify-center">
@@ -131,7 +158,8 @@
       </div>
 
       <!-- Total Loss Card -->
-      <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition">
+      <div
+        class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition">
         <div class="flex items-center justify-between mb-3">
           <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Total Loss</span>
           <div class="p-2.5 bg-rose-500/10 text-rose-500 rounded-xl flex items-center justify-center">
@@ -143,7 +171,8 @@
       </div>
 
       <!-- Win Rate Card -->
-      <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition">
+      <div
+        class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition">
         <div class="flex items-center justify-between mb-3">
           <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Win Rate Trading</span>
           <div class="p-2.5 bg-indigo-500/10 text-indigo-500 rounded-xl flex items-center justify-center">
@@ -155,7 +184,8 @@
       </div>
 
       <!-- Total Saldo Bersih Card -->
-      <div class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition">
+      <div
+        class="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition">
         <div class="flex items-center justify-between mb-3">
           <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Saldo Bersih Saat Ini</span>
           <div class="p-2.5 bg-amber-500/10 text-amber-500 rounded-xl flex items-center justify-center">
@@ -169,24 +199,30 @@
     </div>
 
     <!-- Live High Impact News Warning Banner (Auto Active <= 15 Mins) -->
-    <div id="news-warning-banner" class="hidden bg-gradient-to-r from-rose-500/20 via-amber-500/20 to-rose-500/20 border border-rose-500/40 rounded-3xl p-4 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-pulse">
+    <div id="news-warning-banner"
+      class="hidden bg-gradient-to-r from-rose-500/20 via-amber-500/20 to-rose-500/20 border border-rose-500/40 rounded-3xl p-4 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-pulse">
       <div class="flex items-center gap-3">
         <div class="p-2.5 bg-rose-500/20 text-rose-400 rounded-2xl border border-rose-500/30">
           <iconify-icon icon="lucide:alert-triangle" class="text-2xl text-rose-400"></iconify-icon>
         </div>
         <div>
-          <h4 id="news-banner-title" class="text-sm font-bold text-rose-400">PERINGATAN BERITA HIGH IMPACT (15-MIN ALERT)!</h4>
-          <p id="news-banner-desc" class="text-xs text-zinc-200 mt-0.5">Berita NFP / CPI (USD) akan rilis dalam 15 menit. Waspadai pergerakan harga ekstrem!</p>
+          <h4 id="news-banner-title" class="text-sm font-bold text-rose-400">PERINGATAN BERITA HIGH IMPACT (15-MIN
+            ALERT)!</h4>
+          <p id="news-banner-desc" class="text-xs text-zinc-200 mt-0.5">Berita NFP / CPI (USD) akan rilis dalam 15
+            menit. Waspadai pergerakan harga ekstrem!</p>
         </div>
       </div>
-      <button onclick="dismissNewsBanner()" class="px-4 py-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 text-xs font-bold rounded-xl border border-zinc-700 transition whitespace-nowrap">
+      <button onclick="dismissNewsBanner()"
+        class="px-4 py-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 text-xs font-bold rounded-xl border border-zinc-700 transition whitespace-nowrap">
         Tutup Peringatan
       </button>
     </div>
 
     <!-- High Impact Economic News Calendar Card -->
-    <div id="news-calendar-section" class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200 dark:border-zinc-800 pb-3">
+    <div id="news-calendar-section"
+      class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm space-y-4">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200 dark:border-zinc-800 pb-3">
         <div class="flex items-center gap-3">
           <div class="p-2.5 rounded-2xl bg-rose-500/10 text-rose-500 border border-rose-500/20">
             <iconify-icon icon="lucide:calendar-clock" class="text-xl"></iconify-icon>
@@ -194,22 +230,31 @@
           <div>
             <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
               <span>Kalender Berita High Impact (NFP, CPI, FOMC Alert)</span>
-              <span class="px-2 py-0.5 bg-rose-500/10 text-rose-500 border border-rose-500/30 rounded-full text-[10px] font-extrabold">15-Min System Alert</span>
+              <span
+                class="px-2 py-0.5 bg-rose-500/10 text-rose-500 border border-rose-500/30 rounded-full text-[10px] font-extrabold">15-Min
+                System Alert</span>
             </h3>
-            <p class="text-[11px] text-zinc-400">Pengingat otomatis 15 menit sebelum berita ekonomi besar rilis agar terhindar dari volatilitas ekstrem.</p>
+            <p class="text-[11px] text-zinc-400">Pengingat otomatis 15 menit sebelum berita ekonomi besar rilis agar
+              terhindar dari volatilitas ekstrem.</p>
           </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-          <a href="https://www.youtube.com/results?search_query=Live+US+Economic+News+NFP+CPI+Bloomberg+CNBC" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 bg-red-600/10 hover:bg-red-600/20 text-red-500 border border-red-500/30 rounded-xl text-xs font-bold transition flex items-center gap-1.5" title="Tonton Live Streaming Berita Ekonomi Amerika di YouTube">
+          <a href="https://www.youtube.com/results?search_query=Live+US+Economic+News+NFP+CPI+Bloomberg+CNBC"
+            target="_blank" rel="noopener noreferrer"
+            class="px-3.5 py-1.5 bg-red-600/10 hover:bg-red-600/20 text-red-500 border border-red-500/30 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+            title="Tonton Live Streaming Berita Ekonomi Amerika di YouTube">
             <iconify-icon icon="lucide:youtube" class="text-sm text-red-500"></iconify-icon>
             <span>Live Streaming YT</span>
           </a>
-          <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5" title="Buka Kalender Berita Lengkap ForexFactory">
+          <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener noreferrer"
+            class="px-3.5 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"
+            title="Buka Kalender Berita Lengkap ForexFactory">
             <iconify-icon icon="lucide:external-link" class="text-xs"></iconify-icon>
             <span>ForexFactory</span>
           </a>
-          <button onclick="refreshEconomicCalendarUI()" class="px-3.5 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+          <button onclick="refreshEconomicCalendarUI()"
+            class="px-3.5 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
             <iconify-icon icon="lucide:refresh-cw" id="news-spin-icon" class="text-xs"></iconify-icon>
             <span>Update Berita</span>
           </button>
@@ -221,7 +266,8 @@
         <!-- Event items loaded dynamically -->
       </div>
     </div>
-    <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm space-y-4">
+    <div
+      class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm space-y-4">
       <div class="flex items-center justify-between">
         <div>
           <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
@@ -231,11 +277,13 @@
           <p class="text-xs text-zinc-400">Transaksi gabungan dari jurnal trading dan entri keuangan.</p>
         </div>
         <div class="flex gap-2">
-          <a href="trading.html" class="px-3 py-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 rounded-xl transition flex items-center gap-1">
+          <a href="trading.html"
+            class="px-3 py-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 rounded-xl transition flex items-center gap-1">
             <iconify-icon icon="lucide:plus"></iconify-icon>
             <span>Trading</span>
           </a>
-          <a href="finance.html" class="px-3 py-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 rounded-xl transition flex items-center gap-1">
+          <a href="finance.html"
+            class="px-3 py-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 rounded-xl transition flex items-center gap-1">
             <iconify-icon icon="lucide:plus"></iconify-icon>
             <span>Keuangan</span>
           </a>
@@ -251,9 +299,11 @@
   </main>
 
   <!-- Modal Permission Super Admin -->
-  <div id="permission-modal" class="fixed inset-0 bg-zinc-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-3xl rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-      
+  <div id="permission-modal"
+    class="fixed inset-0 bg-zinc-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div
+      class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-3xl rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+
       <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3">
         <div>
           <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
@@ -268,7 +318,8 @@
       </div>
 
       <!-- Form Create New User (Super Admin Only) -->
-      <form id="create-user-form" onsubmit="createNewUserByAdmin(event)" class="bg-zinc-50 dark:bg-zinc-950 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-3">
+      <form id="create-user-form" onsubmit="createNewUserByAdmin(event)"
+        class="bg-zinc-50 dark:bg-zinc-950 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-3">
         <h4 class="text-xs font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
           <iconify-icon icon="lucide:user-plus" class="text-indigo-500 text-sm"></iconify-icon>
           <span>Buat Pengguna Baru</span>
@@ -276,22 +327,26 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <div>
             <label class="block font-semibold text-zinc-500 mb-1 text-[11px]">Username</label>
-            <input type="text" id="new-user-username" required placeholder="username_baru" class="w-full px-3 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 font-bold">
+            <input type="text" id="new-user-username" required placeholder="username_baru"
+              class="w-full px-3 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 font-bold">
           </div>
           <div>
             <label class="block font-semibold text-zinc-500 mb-1 text-[11px]">Password</label>
-            <input type="password" id="new-user-password" required placeholder="••••••••" class="w-full px-3 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100">
+            <input type="password" id="new-user-password" required placeholder="••••••••"
+              class="w-full px-3 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100">
           </div>
           <div>
             <label class="block font-semibold text-zinc-500 mb-1 text-[11px]">Role Pengguna</label>
-            <select id="new-user-role" class="w-full px-3 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 font-bold">
+            <select id="new-user-role"
+              class="w-full px-3 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 font-bold">
               <option value="User">Member</option>
               <option value="Super Admin">Super Admin</option>
             </select>
           </div>
         </div>
         <div class="flex justify-end">
-          <button type="submit" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs shadow transition flex items-center gap-1.5">
+          <button type="submit"
+            class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs shadow transition flex items-center gap-1.5">
             <iconify-icon icon="lucide:user-check"></iconify-icon>
             <span>+ Buat Akun Pengguna</span>
           </button>
@@ -302,7 +357,8 @@
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-zinc-50 dark:bg-zinc-950/60 text-[11px] uppercase font-bold text-zinc-400 border-b border-zinc-200 dark:border-zinc-800">
+            <tr
+              class="bg-zinc-50 dark:bg-zinc-950/60 text-[11px] uppercase font-bold text-zinc-400 border-b border-zinc-200 dark:border-zinc-800">
               <th class="px-3 py-2.5">User</th>
               <th class="px-3 py-2.5">Role</th>
               <th class="px-3 py-2.5 text-center">Dashboard</th>
@@ -324,20 +380,26 @@
 
   <!-- Mobile Bottom Floating Action Bar -->
   <div class="md:hidden fixed bottom-4 left-4 right-4 z-40">
-    <div class="bg-zinc-900/90 backdrop-blur-md text-white p-2 rounded-2xl shadow-2xl border border-zinc-800 flex items-center justify-around">
-      <a id="mobile-dash-link" href="dashboard.html" class="flex flex-col items-center gap-1 px-4 py-2 text-indigo-400 font-bold text-[11px]">
+    <div
+      class="bg-zinc-900/90 backdrop-blur-md text-white p-2 rounded-2xl shadow-2xl border border-zinc-800 flex items-center justify-around">
+      <a id="mobile-dash-link" href="dashboard.html"
+        class="flex flex-col items-center gap-1 px-4 py-2 text-indigo-400 font-bold text-[11px]">
         <iconify-icon icon="lucide:layout-dashboard" class="text-base"></iconify-icon> Dashboard
       </a>
-      <a id="mobile-trade-link" href="trading.html" class="flex flex-col items-center gap-1 px-4 py-2 text-zinc-400 hover:text-white font-medium text-[11px]">
+      <a id="mobile-trade-link" href="trading.html"
+        class="flex flex-col items-center gap-1 px-4 py-2 text-zinc-400 hover:text-white font-medium text-[11px]">
         <iconify-icon icon="lucide:candlestick-chart" class="text-base"></iconify-icon> Trading
       </a>
-      <a id="mobile-fin-link" href="finance.html" class="flex flex-col items-center gap-1 px-3 py-1.5 text-zinc-400 hover:text-white font-medium text-[11px]">
+      <a id="mobile-fin-link" href="finance.html"
+        class="flex flex-col items-center gap-1 px-3 py-1.5 text-zinc-400 hover:text-white font-medium text-[11px]">
         <iconify-icon icon="lucide:wallet-cards" class="text-base"></iconify-icon> Keuangan
       </a>
-      <a id="mobile-settings-link" href="settings.html" class="flex flex-col items-center gap-1 px-3 py-1.5 text-zinc-400 hover:text-white font-medium text-[11px]">
+      <a id="mobile-settings-link" href="settings.html"
+        class="flex flex-col items-center gap-1 px-3 py-1.5 text-zinc-400 hover:text-white font-medium text-[11px]">
         <iconify-icon icon="lucide:settings" class="text-base"></iconify-icon> Setelan
       </a>
-      <a id="mobile-admin-link" href="admin.html" class="hidden flex flex-col items-center gap-1 px-3 py-1.5 text-amber-400 font-medium text-[11px]">
+      <a id="mobile-admin-link" href="admin.html"
+        class="hidden flex flex-col items-center gap-1 px-3 py-1.5 text-amber-400 font-medium text-[11px]">
         <iconify-icon icon="lucide:shield-check" class="text-base"></iconify-icon> Admin
       </a>
     </div>
@@ -347,4 +409,5 @@
   <script src="js/auth.js"></script>
   <script src="js/dashboard.js"></script>
 </body>
+
 </html>

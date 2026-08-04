@@ -79,11 +79,11 @@ async function loadDashboardData() {
     const totalTradesEl = document.getElementById('dash-total-trades');
     const totalSaldoEl = document.getElementById('dash-saldo');
 
-    if (totalProfitEl) totalProfitEl.textContent = formatPrivacyIDR(d.totalProfit);
-    if (totalLossEl) totalLossEl.textContent = formatPrivacyIDR(d.totalLoss);
+    if (totalProfitEl) totalProfitEl.innerHTML = formatPrivacyIDR(d.totalProfit, false, true);
+    if (totalLossEl) totalLossEl.innerHTML = formatPrivacyIDR(d.totalLoss, false, true);
     if (winRateEl) winRateEl.textContent = `${d.winRate}%`;
     if (totalTradesEl) totalTradesEl.textContent = `${d.totalTrades} Trade`;
-    if (totalSaldoEl) totalSaldoEl.textContent = formatPrivacyIDR(d.totalSaldo);
+    if (totalSaldoEl) totalSaldoEl.innerHTML = formatPrivacyIDR(d.totalSaldo, false, true);
 
     renderRecentActivity(d.recentActivities || []);
   } else {
